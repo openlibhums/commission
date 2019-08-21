@@ -1,62 +1,24 @@
 {% extends "admin/core/base.html" %}
 
-{% block title %}Reports{% endblock %}
-{% block title-section %}Reports{% endblock %}
-{% block title-sub %}Lists available reports{% endblock %}
+{% block title %}Commission Articles{% endblock %}
+{% block title-section %}Commission Articles{% endblock %}
+{% block title-sub %}Lists commissioned articles{% endblock %}
 
 {% block breadcrumbs %}
     {{ block.super }}
-    <li><a href="{% url 'reporting_index' %}">Reporting Index</a></li>
+    <li><a href="{% url 'reporting_index' %}">Commissioning Index</a></li>
 {% endblock %}
 
 {% block body %}
     <div class="box">
+        <div class="title-area">
+            <h2>Commissioned Articles</h2>
+            <a href="" class="button">
+                <i class="fa fa-plus">&nbsp;</i>Commission Article
+            </a>
+        </div>
         <div class="content">
-            <div class="row expanded">
-                <div class="large-6 columns">
 
-                    <ul class="accordion" data-accordion>
-                        <li class="accordion-item" data-accordion-item>
-                            <a href="#" class="accordion-title">Press Report</a>
-                            <div class="accordion-content" data-tab-content>
-                                <p>Shows information at the press level eg. most viewed paper, most viewed journal, submissions etc.</p>
-                                <a href="{% url 'reporting_press' %}">View Report</a>
-                            </div>
-                        </li>
-                        <li class="accordion-item" data-accordion-item>
-                            <a href="#" class="accordion-title">Journal Usage by Month Report</a>
-                            <div class="accordion-content" data-tab-content>
-                                <p>Shows journal usages (views and downloads) grouped by month.</p>
-                                <a href="{% url 'reporting_journal_usage_by_month' %}">View Report</a>
-                            </div>
-                        </li>
-                        <li class="accordion-item" data-accordion-item>
-                            <a href="#" class="accordion-title">Article Metrics</a>
-                            <div class="accordion-content" data-tab-content>
-                                <p>This report provides view and download metrics grouped by Article for a given Journal.</p>
-                                <form method="POST">
-                                    {% csrf_token %}
-                                    {{ journal_report_form }}
-                                </form>
-                            </div>
-                        </li>
-                        <li class="accordion-item" data-accordion-item>
-                            <a href="#" class="accordion-title">Production Times</a>
-                            <div class="accordion-content" data-tab-content>
-                                <p>This report provides average times for production tasks.</p>
-                                <a href="{% url 'reporting_production' %}">View Report</a>
-                            </div>
-                        </li>
-                        <li class="accordion-item" data-accordion-item>
-                            <a href="#" class="accordion-title">Geographical Spread</a>
-                            <div class="accordion-content" data-tab-content>
-                                <p>This report provides views and downloads grouped by country</p>
-                                <a href="{% url 'reporting_geo' %}">View Report by Press</a>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
         </div>
     </div>
 {% endblock %}
