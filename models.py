@@ -6,4 +6,3 @@ class CommissionedArticle(models.Model):
     article = models.ForeignKey('submission.Article')
     commissioning_editor = models.ForeignKey('core.Account')
     commissioned = models.DateTimeField(default=timezone.now)
-    

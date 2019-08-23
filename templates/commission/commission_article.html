@@ -1,0 +1,68 @@
+{% extends "admin/core/base.html" %}
+{% load foundation %}
+{% load static %}
+
+{% block title %}Commission Articles{% endblock %}
+{% block title-section %}Commission Articles{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li><a href="{% url 'commission_index' %}">Commissioning Index</a></li>
+    <li><a href="{% url 'reporting_index' %}">Commission Article</a></li>
+{% endblock %}
+
+{% block body %}
+    <div class="box">
+        <div class="title-area">
+            <h2>Commission Article</h2>
+        </div>
+        <div class="content">
+            <div class="row expanded">
+                <div class="large-6 columns end">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form.title|foundation }}
+
+                        {{ form.abstract|foundation }}
+
+                        {{ form.owner|foundation }}
+
+                        {{ form.language|foundation }}
+
+                        {{ form.section|foundation }}
+
+                        {{ form.license|foundation }}
+
+                        <div class="row">
+                            <div class="large-12 columns">
+                                <button name="save" class="button">Save</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block js %}
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css"
+          integrity="sha256-ibvTNlNAB4VMqE5uFlnBME6hlparj5sEr1ovZ3B/bNA="
+          crossorigin="anonymous"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"
+            integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk="
+            crossorigin="anonymous"></script>
+
+    <script>
+        $('#id_owner').selectize({
+            create: true,
+            sortField: 'text'
+        });
+        $('#id_language').selectize({
+            create: true,
+            sortField: 'text'
+        });
+    </script>
+
+{% endblock js %}
