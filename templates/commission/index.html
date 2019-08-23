@@ -1,4 +1,5 @@
 {% extends "admin/core/base.html" %}
+{% load static %}
 
 {% block title %}Commission Articles{% endblock %}
 {% block title-section %}Commission Articles{% endblock %}
@@ -23,6 +24,7 @@
                     <th width="10%">Commission ID</th>
                     <th width="10%">Article ID</th>
                     <th>Title</th>
+                    <th>Article Owner</th>
                     <th>Editor</th>
                     <th>Commissioned</th>
                     <th>Status</th>
@@ -32,6 +34,7 @@
                         <td>{{ ca.id }}</td>
                         <td>{{ ca.article.id }}</td>
                         <td>{{ ca.article.title }}</td>
+                        <td>{{ ca.article.owner }} <a onclick="return popitup('{% url 'send_user_email_article' ca.article.owner.pk ca.article.pk %}')"><i class="fa fa-envelope">&nbsp;</i></a></td>
                         <td>{{ ca.commissioning_editor }}</td>
                         <td>{{ ca.commissioned }}</td>
                         <td>TODO</td>
@@ -40,4 +43,8 @@
             </table>
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'admin/js/popup.js' %}"></script>
 {% endblock %}
