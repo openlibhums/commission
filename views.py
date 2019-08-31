@@ -38,13 +38,29 @@ def commission_article(request):
             )
             return redirect(
                 reverse(
-                    'commission_index',
+                    'commissioned_article',
+                    kwargs={'commissioned_article_id': com_article.pk}
                 )
             )
 
     template = 'commission/commission_article.html'
     context = {
         'form': form,
+    }
+
+    return render(request, template, context)
+
+
+@editor_user_required
+def commissioned_article(request, commissioned_article_id):
+    article = get_object_or_404(
+        models.CommissionedArticle,
+        pk=commissioned_article_id,
+    )
+
+    template = 'commission/commissioned_article.html'
+    context = {
+        'commissioned_article': article,
     }
 
     return render(request, template, context)
