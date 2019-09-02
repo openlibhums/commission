@@ -13,38 +13,57 @@
 
 {% block body %}
     <div class="box">
-        <div class="title-area">
-            <h2>Commission Article</h2>
-        </div>
-        <div class="content">
-            <div class="row expanded">
-                <div class="large-6 columns end">
-                    <form method="POST">
-
-                        {{ form.errors }}
-                        {% include "elements/forms/errors.html" %}
-                        {% csrf_token %}
-                        {{ form.title|foundation }}
-
-                        {{ form.abstract|foundation }}
-
-                        {{ form.owner|foundation }}
-
-                        {{ form.language|foundation }}
-
-                        {{ form.section|foundation }}
-
-                        {{ form.license|foundation }}
-
-                        <div class="row">
-                            <div class="large-12 columns">
-                                <button name="article" class="button">Save</button>
-                            </div>
-                        </div>
-                    </form>
+        <div class="row expanded">
+            <div class="large-6 columns end">
+                <div class="title-area">
+                    <h2>Commission Article</h2>
                 </div>
+                <div class="content"></div>
+                <form method="POST">
+                    {% include "elements/forms/errors.html" %}
+                    {% csrf_token %}
+                    {{ form.title|foundation }}
+
+                    {{ form.abstract|foundation }}
+
+                    {{ form.owner|foundation }}
+
+                    {{ form.language|foundation }}
+
+                    {{ form.section|foundation }}
+
+                    {{ form.license|foundation }}
+
+                    <div class="row">
+                        <div class="large-12 columns">
+                            <button name="article" class="button">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="large-6 columns end">
+                <div class="title-area">
+                    <h2>Article Authors</h2>
+                </div>
+                <div class="content">
+                    <ul class="list-group">
+                        {% for author in article.authors.all %}
+                            <li class="list-group-item">
+                                {{ author.full_name }}
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item">
+                                This article has no authors listed.
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+
+                </div>
+
             </div>
         </div>
+    </div>
     </div>
 {% endblock body %}
 
