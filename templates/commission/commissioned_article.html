@@ -1,6 +1,7 @@
 {% extends "admin/core/base.html" %}
 {% load foundation %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}Commission Articles{% endblock %}
 {% block title-section %}Commission Articles{% endblock %}
@@ -22,17 +23,17 @@
                 <form method="POST">
                     {% include "elements/forms/errors.html" %}
                     {% csrf_token %}
-                    {{ form.title|foundation }}
+                    {{ article_form.title|foundation }}
 
-                    {{ form.abstract|foundation }}
+                    {{ article_form.abstract|foundation }}
 
-                    {{ form.owner|foundation }}
+                    {{ article_form.owner|foundation }}
 
-                    {{ form.language|foundation }}
+                    {{ article_form.language|foundation }}
 
-                    {{ form.section|foundation }}
+                    {{ article_form.section|foundation }}
 
-                    {{ form.license|foundation }}
+                    {{ article_form.license|foundation }}
 
                     <div class="row">
                         <div class="large-12 columns">
@@ -49,6 +50,19 @@
                     </a>
                 </div>
                 <div class="content">
+
+                    <p>{% trans "You can add an author by clicking the button below. This will open a popup modal for you to complete their details. If you do not have a legitimate email address for this author use @journal.com as a prefix for their email address and Janeway will ignore it." %}</p>
+                        <a href="#" data-open="author" class="small success button">{% trans "Add New Author" %}</a>
+                        {% include "admin/elements/submit/author.html" %}
+                        <p>{% trans "If you know of an existing author, you can select them from the below drop down." %}</p>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <label for="id_section">{% trans "Existing Author" %}</label>
+                            {{ existing_author_form.author }}
+                            {{ existing_author_form.author.errors }}
+                            <button name="existing_author" class="success button">Add Existing Author</button>
+                        </form>
+
                     <ul class="list-group">
                         {% for author in article.authors.all %}
                             <li class="list-group-item">
@@ -88,6 +102,10 @@
             create: true,
             sortField: 'text'
         });
+        $('#id_author').selectize({
+            create: true,
+            sortField: 'text'
+        });
     </script>
 
     <style>
@@ -95,5 +113,9 @@
             padding-top: 10px;
         }
     </style>
+
+    {% if modal %}
+        {% include "elements/open_modal.html" with target=modal %}
+    {% endif %}
 
 {% endblock js %}

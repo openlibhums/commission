@@ -3,6 +3,9 @@ from django.contrib import messages
 
 from plugins.commission import forms, models
 from security.decorators import editor_user_required
+from submission.forms import AuthorForm
+from submission import logic
+from utils import shared
 
 
 @editor_user_required
@@ -38,12 +41,12 @@ def commission_article(request):
                 article=_article,
                 commissioning_editor=request.user
             )
-        return redirect(
-            reverse(
-                'commissioned_article',
-                kwargs={'commissioned_article_id': com_article.pk}
+            return redirect(
+                reverse(
+                    'commissioned_article',
+                    kwargs={'commissioned_article_id': com_article.pk}
+                )
             )
-        )
 
     template = 'commission/commission_article.html'
     context = {
@@ -62,8 +65,21 @@ def commissioned_article(request, commissioned_article_id):
     success = True
 
     form = forms.CommissionArticle(instance=commissioned_article.article)
+    existing_author_form = forms.ExistingAuthor()
+    author_form = AuthorForm()
 
     if request.POST:
+        
+        if 'existing_author' in request.POST:
+            existing_author_form = forms.ExistingAuthor(request.POST)
+            if existing_author_form.is_valid():
+                author = existing_author_form.cleaned_data.get('author')
+                commissioned_article.article.authors.add(author)
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    'Author added to the article.',
+                )
 
         if 'article' in request.POST:
             form = forms.CommissionArticle(
@@ -82,8 +98,34 @@ def commissioned_article(request, commissioned_article_id):
             else:
                 success = False
 
-        if 'author' in request.POST:
-            pass
+        if 'add_author' in request.POST:
+            author_form = AuthorForm(request.POST)
+            modal = 'author'
+
+            author_exists = logic.check_author_exists(request.POST.get('email'))
+            if author_exists:
+                commissioned_article.article.authors.add(author_exists)
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    '%s added to the article' % author_exists.full_name(),
+                )
+            else:
+                if author_form.is_valid():
+                    new_author = author_form.save(commit=False)
+                    new_author.username = new_author.email
+                    new_author.set_password(shared.generate_password())
+                    new_author.save()
+                    new_author.add_account_role(
+                        role_slug='author',
+                        journal=request.journal,
+                    )
+                    commissioned_article.article.authors.add(new_author)
+                    messages.add_message(
+                        request,
+                        messages.SUCCESS,
+                        '%s added to the article' % new_author.full_name(),
+                    )
 
         if success:
             return redirect(
@@ -97,7 +139,9 @@ def commissioned_article(request, commissioned_article_id):
     context = {
         'commissioned_article': commissioned_article,
         'article': commissioned_article.article,
-        'form': form,
+        'article_form': form,
+        'existing_author_form': existing_author_form,
+        'form': author_form,
     }
 
     return render(request, template, context)

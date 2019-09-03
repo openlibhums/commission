@@ -2,6 +2,7 @@ from django import forms
 
 from submission import models
 from core.middleware import GlobalRequestMiddleware
+from core import models as core_models
 
 
 class CommissionArticle(forms.ModelForm):
@@ -33,3 +34,9 @@ class CommissionArticle(forms.ModelForm):
             'section',
             'license',
         )
+
+
+class ExistingAuthor(forms.Form):
+    author = forms.ModelChoiceField(
+        queryset=core_models.Account.objects.all()
+    )
