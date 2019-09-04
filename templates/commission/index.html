@@ -19,7 +19,8 @@
             </a>
         </div>
         <div class="content">
-            <table class="table scroll">
+            <table class="table scroll" id="commission_table">
+                <thead>
                 <tr>
                     <th width="10%">Commission ID</th>
                     <th width="10%">Article ID</th>
@@ -30,18 +31,24 @@
                     <th>Status</th>
                     <th></th>
                 </tr>
+                </thead>
+                <tbody>
                 {% for ca in commissioned_articles %}
                     <tr>
                         <td>{{ ca.id }}</td>
                         <td>{{ ca.article.id }}</td>
                         <td>{{ ca.article.title }}</td>
-                        <td>{{ ca.article.owner }} <a onclick="return popitup('{% url 'send_user_email_article' ca.article.owner.pk ca.article.pk %}')"><i class="fa fa-envelope">&nbsp;</i></a></td>
+                        <td>{{ ca.article.owner }} <a
+                                onclick="return popitup('{% url 'send_user_email_article' ca.article.owner.pk ca.article.pk %}')"><i
+                                class="fa fa-envelope">&nbsp;</i></a></td>
                         <td>{{ ca.commissioning_editor }}</td>
                         <td>{{ ca.commissioned }}</td>
                         <td>{{ ca.status }}</td>
-                        <td><a href="{% url 'commissioned_article' ca.id %}">Edit</a></td>
+                        <td><a href="{% url 'commissioned_article' ca.id %}">Edit</a>
+                        </td>
                     </tr>
                 {% endfor %}
+                </tbody>
             </table>
         </div>
     </div>
@@ -49,5 +56,5 @@
 
 {% block js %}
 <script type="text/javascript" src="{% static 'admin/js/popup.js' %}"></script>
-
+{% include "elements/datatables.html" with target='#commission_table' %}
 {% endblock %}
