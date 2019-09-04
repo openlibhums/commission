@@ -45,9 +45,6 @@
             <div class="large-6 columns end">
                 <div class="title-area">
                     <h2>Article Authors</h2>
-                    <a class="button">
-                        <i class="fa fa-plus"> </i> Add Author
-                    </a>
                 </div>
                 <div class="content">
 
@@ -63,10 +60,12 @@
                             <button name="existing_author" class="success button">Add Existing Author</button>
                         </form>
 
+                    <form method="POST">
+                    {% csrf_token %}
                     <ul class="list-group">
                         {% for author in article.authors.all %}
                             <li class="list-group-item">
-                                {{ author.full_name }}
+                                {{ author.full_name }} <button name="delete_author" value="{{ author.pk }}" class="button warning tiny pull-right"><i class="fa fa-trash"></i></button>
                             </li>
                             {% empty %}
                             <li class="list-group-item">
@@ -74,7 +73,7 @@
                             </li>
                         {% endfor %}
                     </ul>
-
+                    </form>
 
                 </div>
 

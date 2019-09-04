@@ -1,7 +1,7 @@
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.contrib import messages
 
-from plugins.commission import forms, models
+from plugins.commission import forms, models, utils
 from security.decorators import editor_user_required
 from submission.forms import AuthorForm
 from submission import logic
@@ -97,6 +97,14 @@ def commissioned_article(request, commissioned_article_id):
                 )
             else:
                 success = False
+
+        if 'delete_author' in request.POST:
+            delete_author_id = request.POST.get('delete_author')
+            utils.remove_author_from_article(
+                request,
+                commissioned_article.article,
+                delete_author_id
+            )
 
         if 'add_author' in request.POST:
             author_form = AuthorForm(request.POST)
