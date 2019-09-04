@@ -6,8 +6,10 @@ from security.decorators import editor_user_required
 from submission.forms import AuthorForm
 from submission import logic
 from utils import shared
+from security.decorators import has_journal
 
 
+@has_journal
 @editor_user_required
 def index(request):
     """
@@ -23,6 +25,7 @@ def index(request):
     return render(request, template, context)
 
 
+@has_journal
 @editor_user_required
 def commission_article(request):
     """
@@ -56,6 +59,7 @@ def commission_article(request):
     return render(request, template, context)
 
 
+@has_journal
 @editor_user_required
 def commissioned_article(request, commissioned_article_id):
     commissioned_article = get_object_or_404(
