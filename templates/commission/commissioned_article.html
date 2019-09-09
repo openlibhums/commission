@@ -9,7 +9,7 @@
 {% block breadcrumbs %}
     {{ block.super }}
     <li><a href="{% url 'commission_index' %}">Commissioning Index</a></li>
-    <li><a href="{% url 'reporting_index' %}">Commissioned Article #{{ article.pk }}</a></li>
+    <li>Commissioned Article #{{ article.pk }}</li>
 {% endblock %}
 
 {% block body %}
@@ -49,38 +49,75 @@
                 <div class="content">
 
                     <p>{% trans "You can add an author by clicking the button below. This will open a popup modal for you to complete their details. If you do not have a legitimate email address for this author use @journal.com as a prefix for their email address and Janeway will ignore it." %}</p>
-                        <a href="#" data-open="author" class="small success button">{% trans "Add New Author" %}</a>
-                        {% include "admin/elements/submit/author.html" %}
-                        <p>{% trans "If you know of an existing author, you can select them from the below drop down." %}</p>
-                        <form method="POST">
-                            {% csrf_token %}
-                            <label for="id_section">{% trans "Existing Author" %}</label>
-                            {{ existing_author_form.author }}
-                            {{ existing_author_form.author.errors }}
-                            <button name="existing_author" class="success button">Add Existing Author</button>
-                        </form>
-
+                    <a href="#" data-open="author"
+                       class="small success button">{% trans "Add New Author" %}</a>
+                    {% include "admin/elements/submit/author.html" %}
+                    <p>{% trans "If you know of an existing author, you can select them from the below drop down." %}</p>
                     <form method="POST">
-                    {% csrf_token %}
-                    <ul class="list-group">
-                        {% for author in article.authors.all %}
-                            <li class="list-group-item">
-                                {{ author.full_name }} <button name="delete_author" value="{{ author.pk }}" class="button warning tiny pull-right"><i class="fa fa-trash"></i></button>
-                            </li>
-                            {% empty %}
-                            <li class="list-group-item">
-                                This article has no authors listed.
-                            </li>
-                        {% endfor %}
-                    </ul>
+                        {% csrf_token %}
+                        <label for="id_section">{% trans "Existing Author" %}</label>
+                        {{ existing_author_form.author }}
+                        {{ existing_author_form.author.errors }}
+                        <button name="existing_author" class="success button">
+                            Add Existing Author
+                        </button>
                     </form>
 
+                    <form method="POST">
+                        {% csrf_token %}
+                        <ul class="list-group">
+                            {% for author in article.authors.all %}
+                                <li class="list-group-item">
+                                    {{ author.full_name }}
+                                    <button name="delete_author"
+                                            value="{{ author.pk }}"
+                                            class="button warning tiny pull-right">
+                                        <i class="fa fa-trash"></i></button>
+                                </li>
+                                {% empty %}
+                                <li class="list-group-item">
+                                    This article has no authors listed.
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </form>
                 </div>
 
+                <div class="title-area">
+                    <h2>Message Owner</h2>
+                </div>
+                <div class="content">
+                    <p>Once you've set up the base metadata you can send an email inviting the owner of the paper to finish off the submission process.</p>
+                    <a href="#" data-open="message" class="small success button">View Message</a>
+                </div>
             </div>
         </div>
     </div>
+    {% load foundation %}
+{% load i18n %}
+
+<div class="reveal" id="message" data-reveal data-animation-in="slide-in-up"
+     data-animation-out="slide-out-down">
+    <div class="card">
+        <div class="card-divider">
+            <h4><i class="fa fa-envelope">&nbsp;</i>{% trans "Send Message" %}</h4>
+        </div>
+        <div class="card-section">
+            <button class="close-button" data-close aria-label="Close reveal" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <form method="POST">
+                {% csrf_token %}
+                <textarea name="message"></textarea>
+
+                <button class="success button pull-right" type="submit" name="add_author"><i class="fa fa-arrow-right">
+                    &nbsp;</i>{% trans "Send" %}
+                </button>
+            </form>
+        </div>
     </div>
+</div>
+
 {% endblock body %}
 
 {% block js %}
