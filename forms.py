@@ -35,6 +35,11 @@ class CommissionArticle(forms.ModelForm):
             'license',
         )
 
+        help_texts = {
+            'owner': 'The owner must be an existing user. You can add a new '
+                     'user from the manager area.',
+        }
+
 
 class ExistingAuthor(forms.Form):
     author = forms.ModelChoiceField(
