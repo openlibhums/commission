@@ -1,5 +1,6 @@
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.contrib import messages
+from django.utils import timezone
 
 from plugins.commission import forms, models, utils, logic as commission_logic
 from security.decorators import editor_user_required
@@ -7,6 +8,7 @@ from submission.forms import AuthorForm
 from submission import logic
 from utils import shared
 from security.decorators import has_journal
+from utils import notify_helpers
 
 
 @has_journal
@@ -138,6 +140,23 @@ def commissioned_article(request, commissioned_article_id):
                         messages.SUCCESS,
                         '%s added to the article' % new_author.full_name(),
                     )
+
+        if 'send_message' in request.POST:
+            message = request.POST.get('message')
+            notify_helpers.send_email_with_body_from_user(
+                request,
+                'Commissioned Article',
+                commissioned_article.article.owner.email,
+                message,
+                from_user=request.user,
+            )
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                'Message sent.',
+            )
+            commissioned_article.message_sent = timezone.now()
+            commissioned_article.save()
 
         if success:
             return redirect(

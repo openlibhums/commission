@@ -87,7 +87,11 @@
                     <h2>Message Owner</h2>
                 </div>
                 <div class="content">
+                    {% if not commissioned_article.message_sent %}
                     <p>Once you've set up the base metadata you can send an email inviting the owner of the paper to finish off the submission process.</p>
+                    {% else %}
+                    <p>Message was sent on {{ commissioned_article.message_sent }}. However, you may use this function to send it again if required.</p>
+                    {% endif %}
                     <a href="#" data-open="message" class="small success button">View Message</a>
                 </div>
             </div>
@@ -110,7 +114,7 @@
                 {% csrf_token %}
                 <textarea name="message">{{ rendered_template|safe }}</textarea>
 
-                <button class="success button pull-right" type="submit" name="add_author"><i class="fa fa-arrow-right">
+                <button class="success button pull-right" type="submit" name="send_message"><i class="fa fa-arrow-right">
                     &nbsp;</i>{% trans "Send" %}
                 </button>
             </form>
