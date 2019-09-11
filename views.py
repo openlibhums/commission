@@ -1,7 +1,7 @@
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.contrib import messages
 
-from plugins.commission import forms, models, utils
+from plugins.commission import forms, models, utils, logic as commission_logic
 from security.decorators import editor_user_required
 from submission.forms import AuthorForm
 from submission import logic
@@ -147,6 +147,11 @@ def commissioned_article(request, commissioned_article_id):
                 )
             )
 
+    rendered_template = commission_logic.render_commission_email(
+        request,
+        commissioned_article,
+    )
+
     template = 'commission/commissioned_article.html'
     context = {
         'commissioned_article': commissioned_article,
@@ -154,6 +159,7 @@ def commissioned_article(request, commissioned_article_id):
         'article_form': form,
         'existing_author_form': existing_author_form,
         'form': author_form,
+        'rendered_template': rendered_template,
     }
 
     return render(request, template, context)

@@ -108,7 +108,7 @@
             </button>
             <form method="POST">
                 {% csrf_token %}
-                <textarea name="message"></textarea>
+                <textarea name="message">{{ rendered_template|safe }}</textarea>
 
                 <button class="success button pull-right" type="submit" name="add_author"><i class="fa fa-arrow-right">
                     &nbsp;</i>{% trans "Send" %}
@@ -153,5 +153,7 @@
     {% if modal %}
         {% include "elements/open_modal.html" with target=modal %}
     {% endif %}
+
+    {% include "elements/jqte.html" %}
 
 {% endblock js %}
