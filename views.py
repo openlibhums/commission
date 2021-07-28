@@ -2,7 +2,7 @@ from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 
-from plugins.commission import forms, models, utils, logic as commission_logic
+from plugins.commission import forms, models, logic as commission_logic
 from security.decorators import editor_user_required
 from submission.forms import AuthorForm
 from submission import logic
@@ -106,7 +106,7 @@ def commissioned_article(request, commissioned_article_id):
 
         if 'delete_author' in request.POST:
             delete_author_id = request.POST.get('delete_author')
-            utils.remove_author_from_article(
+            commission_logic.remove_author_from_article(
                 request,
                 commissioned_article.article,
                 delete_author_id
@@ -148,7 +148,6 @@ def commissioned_article(request, commissioned_article_id):
                 'Commissioned Article',
                 commissioned_article.article.owner.email,
                 message,
-                from_user=request.user,
             )
             messages.add_message(
                 request,

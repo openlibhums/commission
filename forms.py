@@ -2,7 +2,7 @@ from django import forms
 
 from submission import models
 from core.middleware import GlobalRequestMiddleware
-from core import models as core_models
+from core import models as core_models, forms as core_forms
 
 
 class CommissionArticle(forms.ModelForm):
@@ -10,9 +10,7 @@ class CommissionArticle(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CommissionArticle, self).__init__(*args, **kwargs)
         request = GlobalRequestMiddleware.get_current_request()
-        self.fields[
-            'section'].queryset = models.Section.objects.language().fallbacks(
-            'en').filter(
+        self.fields['section'].queryset = models.Section.objects.filter(
             journal=request.journal,
             public_submissions=True,
         )
@@ -21,8 +19,6 @@ class CommissionArticle(forms.ModelForm):
             journal=request.journal,
             available_for_submission=True,
         )
-
-        self.fields['language'].help_text = None
 
     class Meta:
         model = models.Article

@@ -1,0 +1,17 @@
+[
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "Email text for sending an article commission.",
+      "is_translatable": true,
+      "name": "commission_article",
+      "pretty_name": "Commission Article Email",
+      "type": "rich-text"
+    },
+    "value": {
+      "default": "<p>Dear {{ article.owner.full_name }},</p>\n\n<p>We are requesting that you complete the submission of the article \"{{ article.title|safe }}\".</p>\n\n<p><a href=\"{% journal_url 'submit_info' article.pk %}\">{% journal_url 'submit_info' article.pk %}</a></p>\n\n<p>Regards,</p>\n\n{{ request.user.signature|safe }}"
+    }
+  }
+]
