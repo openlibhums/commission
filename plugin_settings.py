@@ -1,67 +1,37 @@
-from utils import models, setting_handler
-from journal import models as journal_models
+from utils import plugins
+from utils.install import update_settings
 
 PLUGIN_NAME = 'Commission Articles'
 DESCRIPTION = 'Allows editors to commission articles.'
-AUTHOR = 'Andy Byers'
+AUTHOR = 'Open Library of Humanities'
 VERSION = '0.1'
 SHORT_NAME = 'commission'
-DISPLAY_NAME = 'commission'
+DISPLAY_NAME = 'Commission'
 MANAGER_URL = 'commission_index'
-JANEWAY_VERSION = "1.3.6"
+JANEWAY_VERSION = "1.5.0"
+IS_WORKFLOW_PLUGIN = False
 
 
-def get_self():
-    plugin, created = models.Plugin.objects.get_or_create(
-        name=SHORT_NAME,
-        display_name=DISPLAY_NAME,
-        enabled=True,
-        defaults={'version': VERSION}
-    )
-    return plugin
+class CommissionPlugin(plugins.Plugin):
+    plugin_name = PLUGIN_NAME
+    display_name = DISPLAY_NAME
+    description = DESCRIPTION
+    author = AUTHOR
+    short_name = SHORT_NAME
+
+    manager_url = MANAGER_URL
+
+    version = VERSION
+    janeway_version = JANEWAY_VERSION
+
+    is_workflow_plugin = IS_WORKFLOW_PLUGIN
 
 
 def install():
-    new_plugin, created = models.Plugin.objects.get_or_create(
-        name=SHORT_NAME,
-        display_name=DISPLAY_NAME,
-        enabled=True,
-        press_wide=True,
-        defaults={'version': VERSION}
+    CommissionPlugin.install()
+    update_settings(
+        file_path='plugins/commission/install/settings.json'
     )
-
-    setting, c = models.PluginSetting.objects.get_or_create(
-        name='commission_article',
-        plugin=new_plugin,
-        types='rich-text',
-        pretty_name='Commission Article Email',
-        description='Email text for sending an article commission.',
-        is_translatable=True)
-
-    email_setting = '''<p>Dear {{ article.owner.full_name }},</p>
-
-<p>We are requesting that you complete the submission of the article "{{ article.title|safe }}".</p>
-
-<p><a href="{% journal_url 'submit_info' article.pk %}">{% journal_url 'submit_info' article.pk %}</a></p>
-
-<p>Regards,</p>
-
-{{ request.user.signature|safe }}
-    '''
-
-    for journal in journal_models.Journal.objects.all():
-
-        setting_handler.save_plugin_setting(
-            new_plugin,
-            'commission_article',
-            email_setting,
-            journal,
-        )
-
-    if created:
-        print('Plugin {0} installed.'.format(PLUGIN_NAME))
-    else:
-        print('Plugin {0} is already installed.'.format(PLUGIN_NAME))
 
 
 def hook_registry():

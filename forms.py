@@ -1,43 +1,41 @@
 from django import forms
 
 from submission import models
-from core.middleware import GlobalRequestMiddleware
 from core import models as core_models
+from plugins.commission import models as comm_models
+from utils.forms import HTMLDateInput
 
 
 class CommissionArticle(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
+        self.journal = kwargs.pop('journal')
         super(CommissionArticle, self).__init__(*args, **kwargs)
-        request = GlobalRequestMiddleware.get_current_request()
         self.fields[
-            'section'].queryset = models.Section.objects.language().fallbacks(
-            'en').filter(
-            journal=request.journal,
+            'section'].queryset = models.Section.objects.filter(
+            journal=self.journal,
             public_submissions=True,
         )
-
-        self.fields['license'].queryset = models.Licence.objects.filter(
-            journal=request.journal,
-            available_for_submission=True,
-        )
-
-        self.fields['language'].help_text = None
 
     class Meta:
         model = models.Article
         fields = (
             'title',
-            'abstract',
-            'owner',
-            'language',
             'section',
-            'license',
         )
 
         help_texts = {
             'owner': 'The owner must be an existing user. You can add a new '
                      'user from the manager area.',
+        }
+
+
+class DeadlineForm(forms.ModelForm):
+    class Meta:
+        model = comm_models.CommissionedArticle
+        fields = ('deadline',)
+        widgets = {
+            'deadline': HTMLDateInput,
         }
 
 

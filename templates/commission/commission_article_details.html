@@ -1,0 +1,127 @@
+{% extends "admin/core/base.html" %}
+{% load foundation %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Article Commission #{{ comm_article.pk }}{% endblock %}
+{% block title-section %}Commission Articles{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li><a href="{% url 'commission_index' %}">Commissioning Index</a></li>
+    <li>Article Commission #{{ comm_article.pk }}</li>
+{% endblock %}
+
+{% block body %}
+    <div class="box">
+        <div class="row expanded">
+            <div class="content">
+                <div class="large-8 columns">
+                    <div class="title-area">
+                        <h2>Article Commission #{{ comm_article.pk }}</h2>
+                    </div>
+                    <p>{{ comm_article.commissioning_editor }} requesting a
+                        submission
+                        from {{ comm_article.commissioned_author }}</p>
+                    {% if duplicate_commissions %}
+                        <p>Warning: This author already has commission
+                            requests:</p>
+                        <ul>
+                            {% for duplicate in duplicate_commissions %}
+                                <li>
+                                    <a href="{% url 'commissioned_article_details' duplicate.pk %}">Commission
+                                        #{{ duplicate.pk }} commissioned
+                                        on {{ duplicate.commissioned }}
+                                        by {{ duplicate.commissioning_editor }}</a>. {{ duplicate.status }}.
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ article_form|foundation }}
+                        {{ deadline_form|foundation }}
+                        <div class="row expanded">
+                            <div class="large-12 columns">
+                                <button name="save_section"
+                                        class="success button">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="large-4 columns">
+                    <div class="title-area">
+                        <h2>Cancel Commission</h2>
+                    </div>
+                    <p>If you wish to cancel this commission you can use the
+                        button below.</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button name="cancel_commission" class="alert button">
+                            Cancel Commission
+                        </button>
+                    </form>
+                </div>
+                {% if comm_article.author_decision == 'declined' %}
+                <div class="large-4 columns">
+                    <div class="title-area">
+                        <h2>Archive Commission</h2>
+                    </div>
+                    <p>The author has declined this commission. You can archive this request.</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button name="archive_commission" class="alert button">
+                            Archive Commission
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+                 <div class="large-12 columns">
+                        <div class="title-area">
+                            <h2>Notifications</h2>
+                        </div>
+                {% if comm_article.message_sent %}
+                    <p>A notification was sent to the author on {{ comm_article.message_sent }}.</p>
+                    <p>Reminders will be sent to the author on the following days:</p>
+                    <ul>
+                        <li>Before Due Date: {{ comm_article.reminder_before_date }}</li>
+                        <li>After Due Date: {{ comm_article.reminder_after_date }}</li>
+                    </ul>
+                    <p>You can manually contact the author here:</p>
+                    <a class="button" onclick="return popitup('{% url 'send_user_email_article' comm_article.commissioned_author.pk comm_article.article.pk  %}')"><i
+                                class="fa fa-envelope">&nbsp;</i>Contact Author</a>
+                {% elif comm_article.article %}
+                        <div class="content">
+                            <ul class="accordion" data-accordion data-allow-all-closed="true">
+                                {% for rendered_template in rendered_templates %}
+                                    <li class="accordion-item" data-accordion-item>
+                                        <a href="#" class="accordion-title"><strong>Template Name</strong>: {{ rendered_template.template_name }}</a>
+                                        <div class="accordion-content" data-tab-content>
+                                            <form method="POST">
+                                                {% csrf_token %}<textarea name="html">{{ rendered_template.content|safe }}</textarea>
+                                                <button name="template_id" value="{{ rendered_template.template_identifier }}" class="success button">
+                                                    Send Invitation
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                {% else %}
+                    <p>Set a title and section above, then you will be able to send an
+                        invitation email.</p>
+                {% endif %}
+                 </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+
+{% block js %}
+    {% include "elements/jqte.html" %}
+    <script type="text/javascript" src="{% static 'admin/js/popup.js' %}"></script>
+{% endblock js %}

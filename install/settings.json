@@ -1,0 +1,47 @@
+[
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "Default commission email template.",
+      "is_translatable": true,
+      "name": "commission_article",
+      "pretty_name": "Commission Article",
+      "type": "rich-text"
+    },
+    "value": {
+      "default": "<p>Dear {{ commissioned_article.commissioned_author.full_name }},</p>\n\n<p>We are requesting that you complete the submission of the article \"{{ commissioned_article.article.title|safe }}\".</p>\n\n<p><a href=\"{% journal_url 'submit_info' commissioned_article.article.pk %}\">{% journal_url 'submit_info' commissioned_article.article.pk %}</a></p>\n\n<p>Regards,</p>\n\n{{ request.user.signature|safe }}"
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "A reminder will be sent this many days before a commission answer is due.",
+      "is_translatable": true,
+      "name": "commission_reminder_before",
+      "pretty_name": "Days Before Due Reminder",
+      "type": "number"
+    },
+    "value": {
+      "default": 7
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "A reminder will be sent this many days after a commission answer is due.",
+      "is_translatable": true,
+      "name": "commission_reminder_after",
+      "pretty_name": "Days After Due Reminder",
+      "type": "number"
+    },
+    "value": {
+      "default": 7
+    }
+  }
+]
