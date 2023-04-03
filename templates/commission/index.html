@@ -13,9 +13,12 @@
 {% block body %}
     <div class="box">
         <div class="title-area">
-            <h2>Commissioned Articles</h2>
-            <a href="{% url 'commission_article' %}" class="button">
+            <h2>{% if declined_articles %}Declined Commissions{% else %}Commissioned Articles{% endif %}</h2>
+            <a href="{% url 'commission_article_owner' %}" class="button">
                 <i class="fa fa-plus">&nbsp;</i>Commission Article
+            </a>
+            <a href="{% url 'commission_declined' %}" class="button">
+                <i class="fa fa-times-circle">&nbsp;</i>Declined Commissions
             </a>
         </div>
         <div class="content">
@@ -36,15 +39,15 @@
                 {% for ca in commissioned_articles %}
                     <tr>
                         <td>{{ ca.id }}</td>
-                        <td>{{ ca.article.id }}</td>
-                        <td>{{ ca.article.title }}</td>
-                        <td>{{ ca.article.owner }} <a
-                                onclick="return popitup('{% url 'send_user_email_article' ca.article.owner.pk ca.article.pk %}')"><i
+                        <td>{{ ca.article.id|default:'Not started'}}</td>
+                        <td>{{ ca.article.title|default:'Not started' }}</td>
+                        <td>{{ ca.commissioned_author }} <a
+                                onclick="return popitup('{% if ca.article %}{% url 'send_user_email_article' ca.commissioned_author.pk ca.article.pk  %}{% else %}{% url 'send_user_email' ca.commissioned_author.pk %}{% endif %}')"><i
                                 class="fa fa-envelope">&nbsp;</i></a></td>
                         <td>{{ ca.commissioning_editor }}</td>
                         <td>{{ ca.commissioned }}</td>
                         <td>{{ ca.status }}</td>
-                        <td><a href="{% url 'commissioned_article' ca.id %}">Manage</a>
+                        <td><a href="{% url 'commissioned_article_details' ca.id %}">Manage</a>
                         </td>
                     </tr>
                 {% endfor %}

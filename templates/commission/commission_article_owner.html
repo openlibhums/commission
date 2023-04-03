@@ -1,0 +1,96 @@
+{% extends "admin/core/base.html" %}
+{% load foundation %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Commission Articles{% endblock %}
+{% block title-section %}Commission Articles{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li><a href="{% url 'commission_index' %}">Commissioning Index</a></li>
+    <li>Select Author</li>
+{% endblock %}
+
+{% block body %}
+    <div class="box">
+    <div class="row expanded">
+    <div class="large-6 columns">
+        <div class="title-area">
+            <h2>Select Author to Invite</h2>
+        </div>
+        <div class="content">
+            <div class="input-group">
+                <span class="input-group-label">Search Users</span>
+                <input class="input-group-field" type="text"
+                       name="into"
+                       placeholder="Search by email, first name and last name">
+            </div>
+            <input type="submit" class="button" value="Search"
+                   name="from_search"
+                   onclick="search_accounts()">
+            <form method="POST">
+                {% csrf_token %}
+                <table class="small scroll" id="into_table">
+                    <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td colspan="4">Use the search box above to find
+                            users.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="large-6 columns">
+        <div class="title-area">
+            <h2>Add a New Author</h2>
+        </div>
+        <div class="content">
+            <form method="POST">
+                {% csrf_token %}
+                {{ new_author_form|foundation }}
+                <div class="row expanded">
+                    <div class="large-12 columns">
+                        <button name="save_new_author" class="success button">Save New User</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock body %}
+
+
+{% block js %}
+    <script type="text/javascript">
+        function search_accounts() {
+            var tbody_into = "#into_table tbody"
+            $(tbody_into).empty();
+            var search_term_into = $("input[name=into]").val();
+            var url_into = "/api/accounts/?search=" + search_term_into;
+
+            $.get(url_into, function (data) {
+                data.results.forEach((item) => {
+                    var active = (item.is_active) ? "Active" : "Inactive";
+                    var table_row = "<tr><td>" + item.email + "</td><td>" + item.first_name + "</td><td>" + item.last_name + "</td><td>" + active + "</td><td><button class=\"small button\" name=\"select_author\" value=\"" + item.pk + "\">Select Author</button></tr>"
+                    $(tbody_into).append(table_row);
+                });
+                if (jQuery.isEmptyObject(data.results)) {
+                    $(tbody_into).append("<tr><td colspan=\"4\">No results returned.</td>");
+                }
+            });
+        }
+    </script>
+{% endblock %}
