@@ -8,7 +8,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('submission', '0072_auto_20230330_1147'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('commission', '0003_alter_commissionedarticle_commissioning_editor'),
     ]

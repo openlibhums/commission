@@ -43,5 +43,80 @@
     "value": {
       "default": 7
     }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "The number of days after the deadline has past that a commission will expire.",
+      "is_translatable": true,
+      "name": "commission_expiry_days",
+      "pretty_name": "Days After Due Expires",
+      "type": "number"
+    },
+    "value": {
+      "default": 21
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "After deadline commission email template.",
+      "is_translatable": true,
+      "name": "commission_reminder_after_email",
+      "pretty_name": "Commission Article Reminder (After)",
+      "type": "rich-text"
+    },
+    "value": {
+      "default": "<p>Dear {{ commissioned_article.commissioned_author.full_name }},</p>\n\n<p>We previously invited you to submit an article titled \"{{ commissioned_article.article.title|safe }}\".</p><p>The due date of {{ commissioned_article.deadline }} has now passed.</p><p>Please let us know if you can undertake this submission <a href=\"{{ url }}\">{{ url }}</a></p><p>Regards,</p>\n\n{{ journal.name }}"
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "Before deadline commission email template.",
+      "is_translatable": true,
+      "name": "commission_reminder_before_email",
+      "pretty_name": "Commission Article Reminder (Before)",
+      "type": "rich-text"
+    },
+    "value": {
+      "default": "<p>Dear {{ commissioned_article.commissioned_author.full_name }},</p>\n\n<p>We previously invited you to submit an article titled \"{{ commissioned_article.article.title|safe }}\".</p><p>The due date of {{ commissioned_article.deadline }} is getting closer.</p><p>Please let us know if you can undertake this submission <a href=\"{{ url }}\">{{ url }}</a></p>\n\n<p>Regards,</p>\n\n{{ journal.name }}"
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "Email sent to commissioning editor when an author makes a decision.",
+      "is_translatable": true,
+      "name": "commission_author_decision_made",
+      "pretty_name": "Commissioned Article Decision Email",
+      "type": "rich-text"
+    },
+    "value": {
+      "default": "<p>Dear {{ commissioned_article.commissioning_editor.full_name }},</p><p>{{ commissioned_article.commissioned_author.full_name }} has made a decision based on your request that the submit an article titled {{ commissioned_article.article.title }} to {{ commissioned_article.article.journal.name }}.</p><p>Decision: {{ commissioned_article.get_author_decision_display }}</p><p>They will now have access to the submission system to complete the article metadata and upload their manuscript.</p><p>Regards,</p>{{ journal.name }}"
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "Customisable instructions text for the author.",
+      "is_translatable": true,
+      "name": "commission_author_decision_text",
+      "pretty_name": "Commissioned Article Decision Text",
+      "type": "rich-text"
+    },
+    "value": {
+      "default": ""
+    }
   }
 ]

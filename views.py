@@ -1,14 +1,14 @@
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
 from plugins.commission import forms, models, logic as commission_logic
 from security.decorators import editor_user_required, any_editor_user_required
 from submission.forms import AuthorForm
 from submission import logic
-from utils import shared, render_template
+from utils import shared, notify_helpers, setting_handler
 from security.decorators import has_journal
-from utils import notify_helpers, setting_handler
 from core.forms import QuickUserForm
 from core import models as core_models
 
@@ -23,7 +23,6 @@ def index(request):
     """
     commissioned_articles = models.CommissionedArticle.objects.all().exclude(
         author_decision_editor_check=True,
-        author_decision='declined',
     )
     template = 'commission/index.html'
     context = {
@@ -42,7 +41,6 @@ def declined_commissions(request):
     """
     commissioned_articles = models.CommissionedArticle.objects.filter(
         author_decision_editor_check=True,
-        author_decision='declined',
     )
     template = 'commission/index.html'
     context = {
@@ -173,7 +171,6 @@ def commissioned_article(request, commissioned_article_id):
                 'Commissioned Article',
                 commissioned_article.article.owner.email,
                 message,
-                from_user=request.user,
             )
             messages.add_message(
                 request,
@@ -209,6 +206,7 @@ def commissioned_article(request, commissioned_article_id):
     return render(request, template, context)
 
 
+@has_journal
 @any_editor_user_required
 def commission_article_owner(request):
     """
@@ -262,6 +260,7 @@ def commission_article_owner(request):
     )
 
 
+@has_journal
 @any_editor_user_required
 def commissioned_article_details(request, commissioned_article_id):
     comm_article = get_object_or_404(
@@ -392,5 +391,54 @@ def commissioned_article_details(request, commissioned_article_id):
     )
 
 
+@has_journal
+@login_required
 def commissioned_author_decision(request, commissioned_article_id):
-    pass
+    comm_article = get_object_or_404(
+        models.CommissionedArticle,
+        pk=commissioned_article_id,
+        commissioned_author=request.user,
+        author_decision__isnull=True,
+    )
+    if request.POST:
+        if 'accept' in request.POST:
+            comm_article.author_decision = 'accepted'
+        if 'decline' in request.POST:
+            comm_article.author_decision = 'declined'
+
+        comm_article.author_decision_date = timezone.now()
+        comm_article.save()
+
+        if comm_article.author_decision == 'accepted':
+            return redirect(
+                reverse(
+                    'submit_info',
+                    kwargs={
+                        'article_id': comm_article.article.pk
+                    }
+                )
+            )
+        messages.add_message(
+            request,
+            messages.INFO,
+            'Thanks for letting us know that you cannot undertake a submission.'
+        )
+        return redirect(
+            reverse(
+                'core_dashboard',
+            )
+        )
+    template = 'commission/commission_author_decision.html'
+    context = {
+        'comm_article': comm_article,
+        'instructions': setting_handler.get_setting(
+            setting_group_name='plugin:commission',
+            setting_name='commission_author_decision_text',
+            journal=request.journal,
+        ).processed_value,
+    }
+    return render(
+        request,
+        template,
+        context,
+    )

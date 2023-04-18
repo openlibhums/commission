@@ -5,6 +5,7 @@ from plugins.commission import models as commission_models
 from django.contrib import messages
 from django.shortcuts import reverse
 
+
 def remove_author_from_article(request, article, author_id):
     try:
         author = models.Account.objects.get(pk=author_id)
