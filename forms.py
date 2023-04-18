@@ -17,6 +17,15 @@ class CommissionArticle(forms.ModelForm):
             public_submissions=True,
         )
 
+    def save(self, commit=True):
+        article = super(CommissionArticle, self).save(commit=False)
+        article.journal = self.journal
+
+        if commit:
+            article.save()
+
+        return article
+
     class Meta:
         model = models.Article
         fields = (
@@ -33,7 +42,7 @@ class CommissionArticle(forms.ModelForm):
 class DeadlineForm(forms.ModelForm):
     class Meta:
         model = comm_models.CommissionedArticle
-        fields = ('deadline',)
+        fields = ('deadline', 'additional_information')
         widgets = {
             'deadline': HTMLDateInput,
         }

@@ -20,6 +20,11 @@
                     <div class="title-area">
                         <h2>Article Commission #{{ comm_article.pk }}</h2>
                     </div>
+                    {% if comm_article.article and comm_article.check_expiry %}
+                    <div class="callout warning">
+                        <p><span class="fa fa-exclamation-triangle"> </span> Warning: This request has expired. You can still edit the details below and contact the author but no reminders will be sent and the author may expect not to be contacted.</p>
+                    </div>
+                    {% endif %}
                     <p>{{ comm_article.commissioning_editor }} requesting a
                         submission
                         from {{ comm_article.commissioned_author }}</p>
@@ -65,12 +70,11 @@
                         </button>
                     </form>
                 </div>
-                {% if comm_article.author_decision == 'declined' %}
                 <div class="large-4 columns">
                     <div class="title-area">
                         <h2>Archive Commission</h2>
                     </div>
-                    <p>The author has declined this commission. You can archive this request.</p>
+                    <p>You can archive this request. It will be moved from the Active list and no automated messages will be sent to the author.</p>
                     <form method="POST">
                         {% csrf_token %}
                         <button name="archive_commission" class="alert button">
@@ -78,7 +82,6 @@
                         </button>
                     </form>
                 </div>
-                {% endif %}
                  <div class="large-12 columns">
                         <div class="title-area">
                             <h2>Notifications</h2>
@@ -87,8 +90,8 @@
                     <p>A notification was sent to the author on {{ comm_article.message_sent }}.</p>
                     <p>Reminders will be sent to the author on the following days:</p>
                     <ul>
-                        <li>Before Due Date: {{ comm_article.reminder_before_date }}</li>
-                        <li>After Due Date: {{ comm_article.reminder_after_date }}</li>
+                        <li>Before Due Date: {% if comm_article.reminder_before_sent %}A reminder was sent on {{ comm_article.reminder_before_sent }}{% else %}{{ comm_article.reminder_before_date }}{% endif %}</li>
+                        <li>After Due Date: {% if comm_article.reminder_after_sent %}A reminder was sent on {{ comm_article.reminder_after_sent }}{% else %}{{ comm_article.reminder_after_date }}{% endif %}</li>
                     </ul>
                     <p>You can manually contact the author here:</p>
                     <a class="button" onclick="return popitup('{% url 'send_user_email_article' comm_article.commissioned_author.pk comm_article.article.pk  %}')"><i

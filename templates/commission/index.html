@@ -17,9 +17,15 @@
             <a href="{% url 'commission_article_owner' %}" class="button">
                 <i class="fa fa-plus">&nbsp;</i>Commission Article
             </a>
-            <a href="{% url 'commission_declined' %}" class="button">
-                <i class="fa fa-times-circle">&nbsp;</i>Declined Commissions
+            {% if declined_articles %}
+            <a href="{% url 'commission_index' %}" class="button">
+                <i class="fa fa-check-circle">&nbsp;</i>Active Commissions
             </a>
+            {% else %}
+            <a href="{% url 'commission_declined' %}" class="button">
+                <i class="fa fa-times-circle">&nbsp;</i>Archived Commissions
+            </a>
+            {% endif %}
         </div>
         <div class="content">
             <table class="table scroll" id="commission_table">

@@ -8,7 +8,7 @@ from utils import setting_handler
 
 def author_decision_choices():
     return (
-        ('accept', 'Accepted'),
+        ('accepted', 'Accepted'),
         ('declined', 'Declined'),
     )
 
@@ -38,7 +38,12 @@ class CommissionedArticle(models.Model):
     )
     commissioned = models.DateTimeField(default=timezone.now)
     message_sent = models.DateTimeField(null=True, blank=True)
-
+    additional_information = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Add any information you want to provide to the author '
+                  'on the accept/decline page.'
+    )
     author_decision = models.CharField(
         null=True,
         blank=True,
@@ -53,14 +58,28 @@ class CommissionedArticle(models.Model):
         blank=True,
         null=True,
     )
+    reminder_before_sent = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='The date and time the before deadline reminder is sent.',
+    )
+    reminder_after_sent = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='The date and time the after deadline reminder is sent.',
+    )
 
     def status(self):
-        if self.author_decision == 'accept':
+        if self.author_decision_editor_check:
+            return 'Archived'
+        if self.check_expiry():
+            return 'Expired'
+        elif self.author_decision == 'accept':
             return 'Author accepted request'
         elif self.author_decision == 'declined':
             return 'Author declined request'
         elif self.message_sent and not self.author_decision:
-            'Request sent'
+            return 'Request sent'
         else:
             return 'Awaiting response from author'
 
@@ -71,11 +90,11 @@ class CommissionedArticle(models.Model):
             self.article.journal,
         ).processed_value
 
-        dt = timezone.now() - timedelta(days=reminder_before_days)
+        dt = self.deadline - timedelta(days=reminder_before_days)
 
-        if dt < timezone.now():
+        if dt < timezone.now().date():
             return 'This date has now passed.'
-        return dt.date()
+        return dt
 
     def reminder_after_date(self):
         reminder_after_days = setting_handler.get_setting(
@@ -84,12 +103,20 @@ class CommissionedArticle(models.Model):
             self.article.journal,
         ).processed_value
 
-        dt = timezone.now() + timedelta(days=reminder_after_days)
-        if dt < timezone.now():
+        dt = self.deadline + timedelta(days=reminder_after_days)
+        if dt < timezone.now().date():
             return 'This date has now passed.'
-        return dt.date()
+        return dt
 
-
+    def check_expiry(self):
+        expiry_days = setting_handler.get_setting(
+            'plugin:commission',
+            'commission_expiry_days',
+            self.article.journal,
+        ).processed_value
+        if (self.deadline + timedelta(days=expiry_days)) < timezone.now().date():
+            return True
+        return False
 
 
 class CommissionTemplate(models.Model):
