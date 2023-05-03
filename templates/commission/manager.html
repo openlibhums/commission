@@ -1,0 +1,29 @@
+{% extends "admin/core/base.html" %}
+{% load foundation %}
+
+{% block page_title %}Commission Articles{% endblock page_title %}
+{% block title %}Commission Articles{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li><a href="{% url 'commission_index' %}">Commissioning Index</a></li>
+    <li>Commission Settings</li>
+{% endblock %}
+
+
+{% block body %}
+    <div class="box">
+        <div class="content">
+            <div class="row expanded">
+                <div class="large-6 columns">
+                    <p>You can manage the Commission Article's plugin settings from here.</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ manager_form|foundation }}
+                        <button class="button success" type="submit">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}

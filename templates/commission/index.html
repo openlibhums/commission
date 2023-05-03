@@ -26,6 +26,9 @@
                 <i class="fa fa-times-circle">&nbsp;</i>Archived Commissions
             </a>
             {% endif %}
+            <a href="{% url 'commission_manager' %}" class="button">
+                <i class="fa fa-cogs">&nbsp;</i>Settings
+            </a>
         </div>
         <div class="content">
             <table class="table scroll" id="commission_table">

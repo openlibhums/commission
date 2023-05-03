@@ -100,3 +100,107 @@ def get_rendered_templates(request, comm_article):
         }
     )
     return rendered_templates
+
+
+def get_settings(journal):
+    settings = [
+        {
+            'name': 'commission_article',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_article',
+                journal),
+        },
+        {
+            'name': 'commission_reminder_before',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_reminder_before',
+                journal),
+        },
+        {
+            'name': 'commission_reminder_after',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_reminder_after',
+                journal),
+        },
+        {
+            'name': 'commission_expiry_days',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_expiry_days',
+                journal),
+        },
+        {
+            'name': 'commission_reminder_after_email',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_reminder_after_email',
+                journal),
+        },
+        {
+            'name': 'commission_reminder_before_email',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_reminder_before_email',
+                journal),
+        },
+        {
+            'name': 'commission_author_decision_made',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_author_decision_made',
+                journal),
+        },
+        {
+            'name': 'commission_author_decision_text',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_author_decision_text',
+                journal),
+        },
+        {
+            'name': 'commission_submission_deadline_days',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_submission_deadline_days',
+                journal),
+        },
+        {
+            'name': 'commission_reminder_after_article_sub_email',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_reminder_after_article_sub_email',
+                journal),
+        },
+        {
+            'name': 'commission_reminder_before_article_sub_email',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_reminder_before_article_sub_email',
+                journal),
+        },
+        {
+            'name': 'submission_reminder_after',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'submission_reminder_after',
+                journal),
+        },
+        {
+            'name': 'submission_reminder_before',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'submission_reminder_before',
+                journal),
+        },
+        {
+            'name': 'commission_withdrawn_email',
+            'object': setting_handler.get_setting(
+                'plugin:commission',
+                'commission_withdrawn_email',
+                journal),
+        }
+    ]
+    return settings
