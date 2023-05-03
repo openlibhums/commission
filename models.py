@@ -57,6 +57,12 @@ class CommissionedArticle(models.Model):
     deadline = models.DateField(
         blank=True,
         null=True,
+        help_text='The deadline by which the author must accept '
+                  'or decline the commission reuqest.'
+    )
+    submission_deadline = models.DateField(
+        null=True,
+        help_text='The deadline by which the author must submit the article.'
     )
     reminder_before_sent = models.DateTimeField(
         null=True,
@@ -68,13 +74,25 @@ class CommissionedArticle(models.Model):
         blank=True,
         help_text='The date and time the after deadline reminder is sent.',
     )
+    submission_reminder_before_sent = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='The date and time the before submission deadline reminder '
+                  'is sent.',
+    )
+    submission_reminder_after_sent = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='The date and time the after submission deadline reminder '
+                  'is sent.',
+    )
 
     def status(self):
         if self.author_decision_editor_check:
             return 'Archived'
         if self.check_expiry():
             return 'Expired'
-        elif self.author_decision == 'accept':
+        elif self.author_decision == 'accepted':
             return 'Author accepted request'
         elif self.author_decision == 'declined':
             return 'Author declined request'
@@ -108,24 +126,64 @@ class CommissionedArticle(models.Model):
             return 'This date has now passed.'
         return dt
 
-    def check_expiry(self):
-        expiry_days = setting_handler.get_setting(
+    def submission_reminder_before_date(self):
+        reminder_before_days = setting_handler.get_setting(
             'plugin:commission',
-            'commission_expiry_days',
+            'submission_reminder_before',
             self.article.journal,
         ).processed_value
-        if (self.deadline + timedelta(days=expiry_days)) < timezone.now().date():
-            return True
+
+        dt = self.deadline - timedelta(days=reminder_before_days)
+
+        if dt < timezone.now().date():
+            return 'This date has now passed.'
+        return dt
+
+    def submission_reminder_after_date(self):
+        reminder_after_days = setting_handler.get_setting(
+            'plugin:commission',
+            'submission_reminder_after',
+            self.article.journal,
+        ).processed_value
+
+        dt = self.deadline + timedelta(days=reminder_after_days)
+        if dt < timezone.now().date():
+            return 'This date has now passed.'
+        return dt
+
+    def check_expiry(self):
+        if self.article and self.deadline:
+            expiry_days = setting_handler.get_setting(
+                'plugin:commission',
+                'commission_expiry_days',
+                self.article.journal,
+            ).processed_value
+            if (self.deadline + timedelta(days=expiry_days)) < timezone.now().date():
+                return True
         return False
+
+    def calculate_submission_deadline(self):
+        deadline_days = setting_handler.get_setting(
+            'plugin:commission',
+            'commission_submission_deadline_days',
+            self.article.journal,
+        ).processed_value
+        return timezone.now().date() + timedelta(days=deadline_days)
+
+    def set_deadline(self):
+        self.submission_deadline = self.calculate_submission_deadline()
+        self.save()
 
 
 class CommissionTemplate(models.Model):
     name = models.CharField(
         max_length=255,
+        help_text="The name of your template"
     )
     section = models.ForeignKey(
         'submission.Section',
         on_delete=models.CASCADE,
+        help_text="The section your template is to be used for"
     )
     template = models.TextField()
     subject = models.CharField(max_length=255)

@@ -24,6 +24,10 @@
                     <div class="callout warning">
                         <p><span class="fa fa-exclamation-triangle"> </span> Warning: This request has expired. You can still edit the details below and contact the author but no reminders will be sent and the author may expect not to be contacted.</p>
                     </div>
+                    {% elif comm_article.author_decision_date %}
+                        <div class="callout warning">
+                            <p><span class="fa fa-exclamation-triangle"></span> The author has {{ comm_article.author_decision }} this commission on {{ comm_article.author_decision_date|date:"Y-m-d H:i" }}</p>
+                        </div>
                     {% endif %}
                     <p>{{ comm_article.commissioning_editor }} requesting a
                         submission
@@ -42,7 +46,7 @@
                             {% endfor %}
                         </ul>
                     {% endif %}
-
+                    {% if not comm_article.author_decision_date %}
                     <form method="POST">
                         {% csrf_token %}
                         {{ article_form|foundation }}
@@ -56,19 +60,24 @@
                             </div>
                         </div>
                     </form>
+                    {% endif %}
                 </div>
                 <div class="large-4 columns">
                     <div class="title-area">
                         <h2>Cancel Commission</h2>
                     </div>
-                    <p>If you wish to cancel this commission you can use the
-                        button below.</p>
-                    <form method="POST">
-                        {% csrf_token %}
-                        <button name="cancel_commission" class="alert button">
-                            Cancel Commission
-                        </button>
-                    </form>
+                    {% if not comm_article.author_decision_date %}
+                        <p>If you wish to cancel this commission you can use the
+                            button below.</p>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <button name="cancel_commission" class="alert button">
+                                Cancel Commission
+                            </button>
+                        </form>
+                    {% else %}
+                        <p>The author has made a decision, you cannot cancel this commission now.</p>
+                    {% endif %}
                 </div>
                 <div class="large-4 columns">
                     <div class="title-area">
@@ -86,8 +95,8 @@
                         <div class="title-area">
                             <h2>Notifications</h2>
                         </div>
-                {% if comm_article.message_sent %}
-                    <p>A notification was sent to the author on {{ comm_article.message_sent }}.</p>
+                {% if comm_article.message_sent and not comm_article.author_decision_date %}
+                    <p>A notification was sent to the author on {{ comm_article.message_sent }}. A decision on this commission is due on {{ comm_article.deadline|date:"Y-m-d" }}.</p>
                     <p>Reminders will be sent to the author on the following days:</p>
                     <ul>
                         <li>Before Due Date: {% if comm_article.reminder_before_sent %}A reminder was sent on {{ comm_article.reminder_before_sent }}{% else %}{{ comm_article.reminder_before_date }}{% endif %}</li>
@@ -96,6 +105,13 @@
                     <p>You can manually contact the author here:</p>
                     <a class="button" onclick="return popitup('{% url 'send_user_email_article' comm_article.commissioned_author.pk comm_article.article.pk  %}')"><i
                                 class="fa fa-envelope">&nbsp;</i>Contact Author</a>
+                {% elif comm_article.message_sent and comm_article.author_decision_date %}
+                    <p>The submission is due by {{ comm_article.submission_deadline|date:"Y-m-d" }}.</p>
+                    <p>Reminders will be sent to the author on the following days:</p>
+                    <ul>
+                        <li>Before Due Date: {% if comm_article.submission_reminder_before_sent %}A reminder was sent on {{ comm_article.submission_reminder_before_sent }}{% else %}{{ comm_article.submission_reminder_before_date }}{% endif %}</li>
+                        <li>After Due Date: {% if comm_article.submission_reminder_after_sent %}A reminder was sent on {{ comm_article.submission_reminder_after_sent }}{% else %}{{ comm_article.submission_reminder_after_date }}{% endif %}</li>
+                    </ul>
                 {% elif comm_article.article %}
                         <div class="content">
                             <ul class="accordion" data-accordion data-allow-all-closed="true">

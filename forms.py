@@ -7,7 +7,6 @@ from utils.forms import HTMLDateInput
 
 
 class CommissionArticle(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         self.journal = kwargs.pop('journal')
         super(CommissionArticle, self).__init__(*args, **kwargs)
@@ -47,8 +46,30 @@ class DeadlineForm(forms.ModelForm):
             'deadline': HTMLDateInput,
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['deadline'].required = True
+
 
 class ExistingAuthor(forms.Form):
     author = forms.ModelChoiceField(
         queryset=core_models.Account.objects.all()
     )
+
+
+class CommissionTemplateForm(forms.ModelForm):
+    class Meta:
+        model = comm_models.CommissionTemplate
+        fields = (
+            'name',
+            'section',
+            'template',
+        )
+
+    def __init__(self, *args, **kwargs):
+        self.journal = kwargs.pop('journal')
+        super(CommissionTemplateForm, self).__init__(*args, **kwargs)
+        self.fields[
+            'section'].queryset = models.Section.objects.filter(
+            journal=self.journal,
+        )

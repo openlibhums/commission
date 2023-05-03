@@ -101,7 +101,7 @@
       "type": "rich-text"
     },
     "value": {
-      "default": "<p>Dear {{ commissioned_article.commissioning_editor.full_name }},</p><p>{{ commissioned_article.commissioned_author.full_name }} has made a decision based on your request that the submit an article titled {{ commissioned_article.article.title }} to {{ commissioned_article.article.journal.name }}.</p><p>Decision: {{ commissioned_article.get_author_decision_display }}</p><p>They will now have access to the submission system to complete the article metadata and upload their manuscript.</p><p>Regards,</p>{{ journal.name }}"
+      "default": "<p>Dear {{ commissioned_article.commissioning_editor.full_name }},</p><p>{{ commissioned_article.commissioned_author.full_name }} has made a decision based on your request that the submit an article titled {{ commissioned_article.article.title }} to {{ commissioned_article.article.journal.name }}.</p><p>Decision: {{ commissioned_article.get_author_decision_display }}</p><p>Regards,</p>{{ journal.name }}"
     }
   },
   {
@@ -117,6 +117,96 @@
     },
     "value": {
       "default": ""
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "Number of days after acceptance that the submission deadline will be set to.",
+      "is_translatable": true,
+      "name": "commission_submission_deadline_days",
+      "pretty_name": "Commissioned Submission Deadline Days",
+      "type": "number"
+    },
+    "value": {
+      "default": "56"
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "After deadline article submission email template.",
+      "is_translatable": true,
+      "name": "commission_reminder_after_article_sub_email",
+      "pretty_name": "Article Submission Reminder (After)",
+      "type": "rich-text"
+    },
+    "value": {
+      "default": "<p>Dear {{ commissioned_article.commissioned_author.full_name }},</p>\n\n<p>We previously invited you to submit an article titled \"{{ commissioned_article.article.title|safe }}\".</p><p>The due date of {{ commissioned_article.submission_deadline }} has now passed.</p><p>Please let us know if you can undertake this submission <a href=\"{{ url }}\">{{ url }}</a></p><p>Regards,</p>\n\n{{ journal.name }}"
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "Before deadline article submission email template.",
+      "is_translatable": true,
+      "name": "commission_reminder_before_article_sub_email",
+      "pretty_name": "Article Submission Reminder (Before)",
+      "type": "rich-text"
+    },
+    "value": {
+      "default": "<p>Dear {{ commissioned_article.commissioned_author.full_name }},</p>\n\n<p>We previously invited you to submit an article titled \"{{ commissioned_article.article.title|safe }}\".</p><p>The due date of {{ commissioned_article.submission_deadline }} is getting closer.</p><p>Please let us know if you can undertake this submission <a href=\"{{ url }}\">{{ url }}</a></p>\n\n<p>Regards,</p>\n\n{{ journal.name }}"
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "A reminder will be sent this many days after a commission submission is due.",
+      "is_translatable": true,
+      "name": "submission_reminder_after",
+      "pretty_name": "Days After Submission Due Reminder",
+      "type": "number"
+    },
+    "value": {
+      "default": 7
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "A reminder will be sent this many days before a commission submission is due.",
+      "is_translatable": true,
+      "name": "submission_reminder_before",
+      "pretty_name": "Days Before Submission Due Reminder",
+      "type": "number"
+    },
+    "value": {
+      "default": 7
+    }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "If a commission is deleted, the author will be notified with this email.",
+      "is_translatable": true,
+      "name": "commission_withdrawn_email",
+      "pretty_name": "Commission Withdrawn Email",
+      "type": "rich-text"
+    },
+    "value": {
+      "default": "<p>Dear {{ commissioned_article.commissioned_author.full_name }},</p><p>We previously invited you to submit an article titled \"{{ commissioned_article.article.title|safe }}\".</p><p>This request has been withdrawn by the commissioning editor.</p><p>Regards,</p>\n\n{{ journal.name }}"
     }
   }
 ]

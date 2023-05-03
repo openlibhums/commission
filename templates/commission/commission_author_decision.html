@@ -28,6 +28,7 @@
                     <div class="title-area">
                         <h2>Submission Instructions</h2>
                     </div>
+                    <p><strong>If you accept this commission we request that you submit your article before {{ comm_article.calculate_submission_deadline|date:"Y-m-d" }}</strong></p>
                     {{ instructions|safe }}
                 {% endif %}
 

@@ -3,14 +3,18 @@ from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
-from plugins.commission import forms, models, logic as commission_logic
+from plugins.commission import (
+    forms,
+    models,
+    logic as commission_logic,
+    plugin_settings,
+)
 from security.decorators import editor_user_required, any_editor_user_required
 from submission.forms import AuthorForm
 from submission import logic
 from utils import shared, notify_helpers, setting_handler
 from security.decorators import has_journal
-from core.forms import QuickUserForm
-from core import models as core_models
+from core import models as core_models, forms as core_forms
 
 
 @has_journal
@@ -212,12 +216,12 @@ def commission_article_owner(request):
     """
     Allows an editor to set up a commissioned article's owner.
     """
-    new_author_form = QuickUserForm()
+    new_author_form = core_forms.QuickUserForm()
 
     if request.POST:
         owner = None
         if 'save_new_author' in request.POST:
-            new_author_form = QuickUserForm(
+            new_author_form = core_forms.QuickUserForm(
                 request.POST,
             )
             if new_author_form.is_valid():
@@ -320,6 +324,14 @@ def commissioned_article_details(request, commissioned_article_id):
 
         if 'cancel_commission' in request.POST:
             if comm_article.article:
+                notify_helpers.send_email_with_body_from_setting_template(
+                    request=request,
+                    template='commission_withdrawn_email',
+                    subject='Commission Cancelled',
+                    to=comm_article.commissioned_author.email,
+                    context={'commissioned_article': comm_article},
+                    plugin=plugin_settings.CommissionPlugin.get_self(),
+                )
                 comm_article.article.delete()
             comm_article.delete()
             return redirect(
@@ -403,11 +415,24 @@ def commissioned_author_decision(request, commissioned_article_id):
     if request.POST:
         if 'accept' in request.POST:
             comm_article.author_decision = 'accepted'
+            comm_article.set_deadline()
         if 'decline' in request.POST:
             comm_article.author_decision = 'declined'
 
         comm_article.author_decision_date = timezone.now()
         comm_article.save()
+
+        email_context = {
+            'commissioned_article': comm_article,
+        }
+        notify_helpers.send_email_with_body_from_setting_template(
+            request=request,
+            template='commission_author_decision_made',
+            subject=f'{request.journal.name} Commissioned Article',
+            to=comm_article.commissioning_editor.email,
+            context=email_context,
+            plugin=plugin_settings.CommissionPlugin.get_self(),
+        )
 
         if comm_article.author_decision == 'accepted':
             return redirect(
@@ -421,8 +446,10 @@ def commissioned_author_decision(request, commissioned_article_id):
         messages.add_message(
             request,
             messages.INFO,
-            'Thanks for letting us know that you cannot undertake a submission.'
+            'Thanks for letting us know that you cannot '
+            'undertake a submission.'
         )
+
         return redirect(
             reverse(
                 'core_dashboard',
@@ -436,6 +463,132 @@ def commissioned_author_decision(request, commissioned_article_id):
             setting_name='commission_author_decision_text',
             journal=request.journal,
         ).processed_value,
+    }
+    return render(
+        request,
+        template,
+        context,
+    )
+
+
+@has_journal
+@editor_user_required
+def section_template(request):
+    """
+    Displays a list of section templates
+    """
+    section_templates = models.CommissionTemplate.objects.filter(
+        section__journal=request.journal,
+    )
+    if request.POST and 'delete' in request.POST:
+        id_to_delete = request.POST.get('delete')
+        object_to_delete = get_object_or_404(
+            models.CommissionTemplate,
+            pk=id_to_delete,
+            section__journal=request.journal,
+        )
+        object_to_delete.delete()
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            'Template deleted',
+        )
+        return redirect(reverse('commission_templates'))
+    template = 'commission/section_templates.html'
+    context = {
+        'section_templates': section_templates,
+    }
+    return render(
+        request,
+        template,
+        context,
+    )
+
+
+@has_journal
+@editor_user_required
+def section_template_form(request, section_template_id=None):
+    if section_template_id:
+        section = get_object_or_404(
+            models.CommissionTemplate,
+            pk=section_template_id,
+        )
+    else:
+        section = None
+
+    form = forms.CommissionTemplateForm(
+        instance=section,
+        journal=request.journal,
+    )
+    if request.POST:
+        form = forms.CommissionTemplateForm(
+            request.POST,
+            instance=section,
+            journal=request.journal,
+        )
+        if form.is_valid():
+            form.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                'Saved',
+            )
+            return redirect(
+                reverse(
+                    'commission_templates',
+                )
+            )
+    template = 'commission/section_template_form.html'
+    context = {
+        'section': section,
+        'form': form,
+        'default_template': setting_handler.get_setting(
+            'plugin:commission',
+            'commission_article',
+            request.journal,
+        ).processed_value,
+    }
+    return render(
+        request,
+        template,
+        context,
+    )
+
+
+@has_journal
+@editor_user_required
+def manager(request):
+    """
+    Displays a list of settings for editing.
+    """
+    settings = commission_logic.get_settings(request.journal)
+
+    setting_group = 'plugin:commission'
+    manager_form = core_forms.GeneratedSettingForm(
+        settings=settings
+    )
+    if request.POST:
+        manager_form = core_forms.GeneratedSettingForm(
+            request.POST,
+            settings=settings,
+        )
+        if manager_form.is_valid():
+            manager_form.save(
+                group=setting_group,
+                journal=request.journal,
+            )
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                'Form saved.',
+            )
+            return redirect(
+                reverse('commission_manager')
+            )
+
+    template = 'commission/manager.html'
+    context = {
+        'manager_form': manager_form,
     }
     return render(
         request,
