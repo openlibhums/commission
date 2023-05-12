@@ -36,7 +36,7 @@ urlpatterns = [
     url(r'^(?P<commissioned_article_id>\d+)/details/$',
         views.commissioned_article_details,
         name='commissioned_article_details'),
-    url(r'^(?P<commissioned_article_id>\d+)/author/decision/$',
+        url(r'^(?P<commissioned_article_id>\d+)/author/decision/$',
         views.commissioned_author_decision,
         name='commissioned_author_decision'),
 ]

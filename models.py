@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.db import models
 from django.utils import timezone
 
-from utils import setting_handler
+from utils import setting_handler, notify_helpers, render_template
 
 
 def author_decision_choices():
@@ -174,6 +174,36 @@ class CommissionedArticle(models.Model):
         self.submission_deadline = self.calculate_submission_deadline()
         self.save()
 
+    def send_author_notification_email(self, request):
+        template = CommissionTemplate.objects.filter(
+            section=self.article.section,
+            sent_on_acceptance=True,
+        ).first()
+        if template:
+            email_context = {
+                'commissioned_article': self,
+            }
+            log_dict = {
+                'level': 'Info',
+                'action_text': 'Commission Acceptance Notification',
+                'types': 'Commission',
+                'actor': request.user,
+                'target': self.article,
+            }
+            body = render_template.get_message_content(
+                request,
+                email_context,
+                template.template,
+                template_is_setting=True,
+            )
+            notify_helpers.send_email_with_body_from_user(
+                request=request,
+                subject=template.subject,
+                to=self.commissioned_author.email,
+                body=body,
+                log_dict=log_dict,
+            )
+
 
 class CommissionTemplate(models.Model):
     name = models.CharField(
@@ -187,6 +217,9 @@ class CommissionTemplate(models.Model):
     )
     template = models.TextField()
     subject = models.CharField(max_length=255)
+    sent_on_acceptance = models.BooleanField(
+        default=False,
+    )
 
     def __str__(self):
         return self.name

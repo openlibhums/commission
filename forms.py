@@ -1,5 +1,7 @@
 from django import forms
 
+from django_summernote.widgets import SummernoteWidget
+
 from submission import models
 from core import models as core_models
 from plugins.commission import models as comm_models
@@ -64,7 +66,11 @@ class CommissionTemplateForm(forms.ModelForm):
             'name',
             'section',
             'template',
+            'sent_on_acceptance',
         )
+        widgets = {
+            'template': SummernoteWidget(),
+        }
 
     def __init__(self, *args, **kwargs):
         self.journal = kwargs.pop('journal')

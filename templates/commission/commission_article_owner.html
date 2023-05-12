@@ -79,7 +79,7 @@
             var tbody_into = "#into_table tbody"
             $(tbody_into).empty();
             var search_term_into = $("input[name=into]").val();
-            var url_into = "/api/accounts/?search=" + search_term_into;
+            var url_into = "{% if request.journal %}/{{ journal.code }}{% endif %}/api/accounts/?search=" + search_term_into;
 
             $.get(url_into, function (data) {
                 data.results.forEach((item) => {

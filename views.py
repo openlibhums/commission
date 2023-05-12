@@ -18,7 +18,7 @@ from core import models as core_models, forms as core_forms
 
 
 @has_journal
-@editor_user_required
+@any_editor_user_required
 def index(request):
     """
     Displays a list of reports for a user to select.
@@ -28,6 +28,10 @@ def index(request):
     commissioned_articles = models.CommissionedArticle.objects.all().exclude(
         author_decision_editor_check=True,
     )
+    if request.user.is_section_editor(request) and not request.user.is_editor(request):
+        commissioned_articles = commissioned_articles.filter(
+            commissioning_editor=request.user,
+        )
     template = 'commission/index.html'
     context = {
         'commissioned_articles': commissioned_articles,
@@ -36,7 +40,7 @@ def index(request):
 
 
 @has_journal
-@editor_user_required
+@any_editor_user_required
 def declined_commissions(request):
     """
     Displays a list of reports for a user to select.
@@ -46,6 +50,10 @@ def declined_commissions(request):
     commissioned_articles = models.CommissionedArticle.objects.filter(
         author_decision_editor_check=True,
     )
+    if request.user.is_section_editor(request) and not request.user.is_editor(request):
+        commissioned_articles = commissioned_articles.filter(
+            commissioning_editor=request.user,
+        )
     template = 'commission/index.html'
     context = {
         'declined_articles': True,
@@ -55,7 +63,7 @@ def declined_commissions(request):
 
 
 @has_journal
-@editor_user_required
+@any_editor_user_required
 def commission_article(request):
     """
     Allows an editor to commission an article.
@@ -89,7 +97,7 @@ def commission_article(request):
 
 
 @has_journal
-@editor_user_required
+@any_editor_user_required
 def commissioned_article(request, commissioned_article_id):
     commissioned_article = get_object_or_404(
         models.CommissionedArticle,
@@ -416,12 +424,16 @@ def commissioned_author_decision(request, commissioned_article_id):
         if 'accept' in request.POST:
             comm_article.author_decision = 'accepted'
             comm_article.set_deadline()
+            comm_article.send_author_notification_email(
+                request,
+            )
         if 'decline' in request.POST:
             comm_article.author_decision = 'declined'
 
         comm_article.author_decision_date = timezone.now()
         comm_article.save()
 
+        # Send email to editor
         email_context = {
             'commissioned_article': comm_article,
         }
@@ -439,7 +451,7 @@ def commissioned_author_decision(request, commissioned_article_id):
                 reverse(
                     'submit_info',
                     kwargs={
-                        'article_id': comm_article.article.pk
+                        'core_dashboard',
                     }
                 )
             )
