@@ -21,7 +21,7 @@
                         <a class="button" href="{% url 'commission_section_template_form_new' %}"><span class="fa fa-plus-circle"> </span> Add New Template</a>
                     </div>
                     <p>Create your template below. Here is the default template as an example:</p>
-                    <div class="large-12 columns"> <pre>{{ default_template }}</pre></div>
+                    <div class="large-12 columns"> <textarea rows="10" cols="12">{{ default_template }}</textarea></div>
                     <form method="POST">
                         {% csrf_token %}
                         {{ form|foundation }}

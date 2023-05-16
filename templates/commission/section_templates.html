@@ -1,5 +1,5 @@
 {% extends "admin/core/base.html" %}
-{% load foundation %}
+{% load foundation bool_fa %}
 
 {% block page_title %}Commission Articles{% endblock page_title %}
 {% block title %}Commission Articles{% endblock %}
@@ -25,6 +25,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Section</th>
+                            <th>Sent on Acceptance</th>
                             <th>Edit</th>
                             <th>Delete</th>
                         </tr>
@@ -32,6 +33,7 @@
                             <tr>
                                 <td>{{ template.name }}</td>
                                 <td>{{ template.section.name }}</td>
+                                <td>{{ template.sent_on_acceptance|bool_fa }}</td>
                                 <td><a class="small success button" href="{% url 'commission_section_template_form' template.pk %}">Edit</a></td>
                                 <td><form method="POST">{% csrf_token %}<button class="small warning button delete" name="delete" value="{{ template.pk }}"> Delete</button></form></td>
                             </tr>

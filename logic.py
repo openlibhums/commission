@@ -67,6 +67,7 @@ def get_rendered_templates(request, comm_article):
     if comm_article.article:
         section_templates = commission_models.CommissionTemplate.objects.filter(
             section=comm_article.article.section,
+            sent_on_acceptance=False,
         )
         for template in section_templates:
             rendered_templates.append(
