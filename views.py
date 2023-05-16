@@ -40,6 +40,25 @@ def index(request):
 
 
 @has_journal
+@editor_user_required
+def declined_commissions(request):
+    """
+    Displays a list of reports for a user to select.
+    :param request: HttpRequest object
+    :return: HttpResponse or HttpRedirect
+    """
+    commissioned_articles = models.CommissionedArticle.objects.filter(
+        author_decision_editor_check=True,
+    )
+    template = 'commission/index.html'
+    context = {
+        'declined_articles': True,
+        'commissioned_articles': commissioned_articles,
+    }
+    return render(request, template, context)
+
+
+@has_journal
 @any_editor_user_required
 def declined_commissions(request):
     """
