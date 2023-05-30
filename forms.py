@@ -43,9 +43,10 @@ class CommissionArticle(forms.ModelForm):
 class DeadlineForm(forms.ModelForm):
     class Meta:
         model = comm_models.CommissionedArticle
-        fields = ('deadline', 'additional_information')
+        fields = ('deadline', 'submission_deadline', 'additional_information')
         widgets = {
             'deadline': HTMLDateInput,
+            'submission_deadline': HTMLDateInput,
         }
 
     def __init__(self, *args, **kwargs):

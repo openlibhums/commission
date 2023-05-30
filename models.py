@@ -58,7 +58,8 @@ class CommissionedArticle(models.Model):
         blank=True,
         null=True,
         help_text='The deadline by which the author must accept '
-                  'or decline the commission reuqest.'
+                  'or decline the commission request.',
+        verbose_name="Request deadline",
     )
     submission_deadline = models.DateField(
         null=True,

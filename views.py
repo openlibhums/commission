@@ -442,7 +442,6 @@ def commissioned_author_decision(request, commissioned_article_id):
     if request.POST:
         if 'accept' in request.POST:
             comm_article.author_decision = 'accepted'
-            comm_article.set_deadline()
             comm_article.send_author_notification_email(
                 request,
             )
