@@ -455,6 +455,12 @@ def commissioned_author_decision(request, commissioned_article_id):
         email_context = {
             'commissioned_article': comm_article,
         }
+        log_dict = {
+            'target': comm_article.article,
+            'types': 'Commission',
+            'level': 'Info',
+            'action_text': 'Commission Article email sent.',
+        }
         notify_helpers.send_email_with_body_from_setting_template(
             request=request,
             template='commission_author_decision_made',
@@ -463,28 +469,19 @@ def commissioned_author_decision(request, commissioned_article_id):
             context=email_context,
             plugin=plugin_settings.CommissionPlugin.get_self(),
         )
-
-        if comm_article.author_decision == 'accepted':
-            return redirect(
-                reverse(
-                    'submit_info',
-                    kwargs={
-                        'core_dashboard',
-                    }
-                )
-            )
         messages.add_message(
             request,
             messages.INFO,
-            'Thanks for letting us know that you cannot '
-            'undertake a submission.'
+            'Thanks for letting us know that you cannot undertake a '
+            'submission. You will find the article under "Incomplete '
+            'Submissions"',
         )
-
         return redirect(
             reverse(
                 'core_dashboard',
             )
         )
+
     template = 'commission/commission_author_decision.html'
     context = {
         'comm_article': comm_article,

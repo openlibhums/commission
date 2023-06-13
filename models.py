@@ -93,6 +93,8 @@ class CommissionedArticle(models.Model):
             return 'Archived'
         if self.check_expiry():
             return 'Expired'
+        elif not self.message_sent:
+            return 'Notification not sent'
         elif self.author_decision == 'accepted':
             return 'Author accepted request'
         elif self.author_decision == 'declined':
