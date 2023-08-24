@@ -208,5 +208,20 @@
     "value": {
       "default": "<p>Dear {{ commissioned_article.commissioned_author.full_name }},</p><p>We previously invited you to submit an article titled \"{{ commissioned_article.article.title|safe }}\".</p><p>This request has been withdrawn by the commissioning editor.</p><p>Regards,</p>\n\n{{ journal.name }}"
     }
+  },
+  {
+    "group": {
+      "name": "plugin:commission"
+    },
+    "setting": {
+      "description": "Add an email address here and they will be CC'd onto all outgoing invite emails.",
+      "is_translatable": true,
+      "name": "commission_cc_address",
+      "pretty_name": "CC Invitations Email",
+      "type": "char"
+    },
+    "value": {
+      "default": ""
+    }
   }
 ]

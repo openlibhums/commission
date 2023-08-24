@@ -327,11 +327,17 @@ def commissioned_article_details(request, commissioned_article_id):
             else:
                 subject = f'{request.journal.name} Commissioned Article'
 
+            cc = request.journal.get_setting(
+                group_name='plugin:commission',
+                setting_name='commission_cc_address'
+            )
+
             notify_helpers.send_email_with_body_from_user(
                 request,
                 subject,
                 comm_article.commissioned_author.email,
                 email_content,
+                cc=[cc],
             )
             messages.add_message(
                 request,
