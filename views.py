@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
@@ -253,6 +255,7 @@ def commission_article_owner(request):
             )
             if new_author_form.is_valid():
                 owner = new_author_form.save()
+                owner.set_password(shared.generate_password())
                 owner.is_active = True
                 owner.save()
                 owner.add_account_role('author', request.journal)
@@ -451,8 +454,21 @@ def commissioned_author_decision(request, commissioned_article_id):
             comm_article.send_author_notification_email(
                 request,
             )
+            messages.add_message(
+                request,
+                messages.INFO,
+                'Thanks for letting us know that you can undertake a '
+                'submission. You will find the article under "Incomplete '
+                'Submissions"',
+            )
         if 'decline' in request.POST:
             comm_article.author_decision = 'declined'
+            messages.add_message(
+                request,
+                messages.INFO,
+                'Thanks for letting us know that you cannot undertake a '
+                'submission.',
+            )
 
         comm_article.author_decision_date = timezone.now()
         comm_article.save()
@@ -474,13 +490,7 @@ def commissioned_author_decision(request, commissioned_article_id):
             to=comm_article.commissioning_editor.email,
             context=email_context,
             plugin=plugin_settings.CommissionPlugin.get_self(),
-        )
-        messages.add_message(
-            request,
-            messages.INFO,
-            'Thanks for letting us know that you cannot undertake a '
-            'submission. You will find the article under "Incomplete '
-            'Submissions"',
+            log_dict=log_dict,
         )
         return redirect(
             reverse(
