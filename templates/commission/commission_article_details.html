@@ -2,6 +2,7 @@
 {% load foundation %}
 {% load static %}
 {% load i18n %}
+{% load fqdn %}
 
 {% block title %}Article Commission #{{ comm_article.pk }}{% endblock %}
 {% block title-section %}Commission Articles{% endblock %}
@@ -78,8 +79,7 @@
                     {% else %}
                         <p>The author has made a decision, you cannot cancel this commission now.</p>
                     {% endif %}
-                </div>
-                <div class="large-4 columns">
+
                     <div class="title-area">
                         <h2>Archive Commission</h2>
                     </div>
@@ -102,7 +102,18 @@
                         <li>Before Due Date: {% if comm_article.reminder_before_sent %}A reminder was sent on {{ comm_article.reminder_before_sent }}{% else %}{{ comm_article.reminder_before_date }}{% endif %}</li>
                         <li>After Due Date: {% if comm_article.reminder_after_sent %}A reminder was sent on {{ comm_article.reminder_after_sent }}{% else %}{{ comm_article.reminder_after_date }}{% endif %}</li>
                     </ul>
-                    <p>You can manually contact the author here:</p>
+
+                    <div class="title-area">
+                        <h2>Contact Author</h2>
+                    </div>
+                    <p>You can manually contact the author using the button below.</p>
+                    <p>Useful links for use when contacting authors:</p>
+
+                    <ul>
+                        {% if not comm_article.author_decision_date %}<li>Commission Decision page: {% site_url 'commissioned_author_decision' comm_article.pk %}</li>{% endif %}
+                        <li>Article Submission page: {% site_url 'submission_start' comm_article.article.pk %}</li>
+                    </ul>
+
                     <a class="button" onclick="return popitup('{% url 'send_user_email_article' comm_article.commissioned_author.pk comm_article.article.pk  %}')"><i
                                 class="fa fa-envelope">&nbsp;</i>Contact Author</a>
                 {% elif comm_article.message_sent and comm_article.author_decision_date %}
