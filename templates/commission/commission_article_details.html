@@ -67,7 +67,6 @@
                     <div class="title-area">
                         <h2>Cancel Commission</h2>
                     </div>
-                    {% if not comm_article.author_decision_date %}
                         <p>If you wish to cancel this commission you can use the
                             button below.</p>
                         <form method="POST">
@@ -76,10 +75,6 @@
                                 Cancel Commission
                             </button>
                         </form>
-                    {% else %}
-                        <p>The author has made a decision, you cannot cancel this commission now.</p>
-                    {% endif %}
-
                     <div class="title-area">
                         <h2>Archive Commission</h2>
                     </div>
@@ -90,6 +85,21 @@
                             Archive Commission
                         </button>
                     </form>
+                    {% if not comm_article.author_decision_date %}
+                        <div class="title-area">
+                            <h2>Accept/Decline Commission</h2>
+                        </div>
+                        <p>You can accept or decline this commission request on behalf of the author.</p>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <button name="accept_commission" class="success button">
+                                Accept Commission
+                            </button>
+                            <button name="decline_commission" class="alert button">
+                                Decline Commission
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
                  <div class="large-12 columns">
                         <div class="title-area">
@@ -102,7 +112,7 @@
                         <li>Before Due Date: {% if comm_article.reminder_before_sent %}A reminder was sent on {{ comm_article.reminder_before_sent }}{% else %}{{ comm_article.reminder_before_date }}{% endif %}</li>
                         <li>After Due Date: {% if comm_article.reminder_after_sent %}A reminder was sent on {{ comm_article.reminder_after_sent }}{% else %}{{ comm_article.reminder_after_date }}{% endif %}</li>
                     </ul>
-
+                {% endif %}
                     <div class="title-area">
                         <h2>Contact Author</h2>
                     </div>
@@ -116,7 +126,10 @@
 
                     <a class="button" onclick="return popitup('{% url 'send_user_email_article' comm_article.commissioned_author.pk comm_article.article.pk  %}')"><i
                                 class="fa fa-envelope">&nbsp;</i>Contact Author</a>
-                {% elif comm_article.message_sent and comm_article.author_decision_date %}
+                {% if comm_article.message_sent and comm_article.author_decision_date %}
+                    <div class="title-area">
+                        <h2>Automatic Notifications</h2>
+                    </div>
                     <p>The submission is due by {{ comm_article.submission_deadline|date:"Y-m-d" }}.</p>
                     <p>Reminders will be sent to the author on the following days:</p>
                     <ul>

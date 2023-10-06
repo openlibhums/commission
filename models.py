@@ -97,10 +97,10 @@ class CommissionedArticle(models.Model):
             return 'Author accepted request'
         elif self.author_decision == 'declined':
             return 'Author declined request'
-        elif self.message_sent and not self.author_decision:
-            return 'Request sent'
         elif self.check_expiry():
             return 'Expired'
+        elif self.message_sent and not self.author_decision:
+            return 'Request sent'
         else:
             return 'Awaiting response from author'
 

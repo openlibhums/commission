@@ -388,6 +388,33 @@ def commissioned_article_details(request, commissioned_article_id):
                     'commission_index'
                 )
             )
+        if 'accept_commission' in request.POST or 'decline_commission' in request.POST:
+            if 'accept_commission' in request.POST:
+                comm_article.author_decision = 'accepted'
+                comm_article.send_author_notification_email(
+                    request,
+                )
+                messages.add_message(
+                    request,
+                    messages.INFO,
+                    'Commission accepted on behalf the author.',
+                )
+            if 'decline_commission' in request.POST:
+                comm_article.author_decision = 'declined'
+                messages.add_message(
+                    request,
+                    messages.INFO,
+                    'Commission declined on behalf of the author.',
+                )
+
+            comm_article.author_decision_date = timezone.now()
+            comm_article.save()
+
+            return redirect(
+                reverse(
+                    'commission_index'
+                )
+            )
         if 'save_section' in request.POST:
             article_form = forms.CommissionArticle(
                 request.POST,
