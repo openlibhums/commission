@@ -91,7 +91,7 @@ class CommissionedArticle(models.Model):
     def status(self):
         if self.author_decision_editor_check:
             return 'Archived'
-        elif not self.message_sent:
+        elif not self.message_sent and not self.author_decision:
             return 'Notification not sent'
         elif self.author_decision == 'accepted':
             return 'Author accepted request'

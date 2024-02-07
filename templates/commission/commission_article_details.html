@@ -121,11 +121,12 @@
 
                     <ul>
                         {% if not comm_article.author_decision_date %}<li>Commission Decision page: {% site_url 'commissioned_author_decision' comm_article.pk %}</li>{% endif %}
-                        <li>Article Submission page: {% site_url 'submission_start' comm_article.article.pk %}</li>
+                        {% if comm_article.article %}<li>Article Submission page: {% site_url 'submission_start' comm_article.article.pk %}</li>{% endif %}
                     </ul>
 
-                    <a class="button" onclick="return popitup('{% url 'send_user_email_article' comm_article.commissioned_author.pk comm_article.article.pk  %}')"><i
-                                class="fa fa-envelope">&nbsp;</i>Contact Author</a>
+                    {% if comm_article.article %}
+                     <a class="button" onclick="return popitup('{% url 'send_user_email_article' comm_article.commissioned_author.pk comm_article.article.pk  %}')"><i
+-                                class="fa fa-envelope">&nbsp;</i>Contact Author</a>{% endif %}
                 {% if comm_article.message_sent and comm_article.author_decision_date %}
                     <div class="title-area">
                         <h2>Automatic Notifications</h2>
