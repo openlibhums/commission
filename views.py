@@ -4,6 +4,7 @@ from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 from plugins.commission import (
     forms,
@@ -670,7 +671,9 @@ def manager(request):
 @has_journal
 @editor_user_required
 def commission_reminders(request):
-    commissioned_articles = models.CommissionedArticle.objects.all()
+    commissioned_articles = models.CommissionedArticle.objects.exclude(
+        Q(submission_deadline__isnull=True) | Q(deadline__isnull=True)
+    )
     reminder_before_days = request.journal.get_setting(
         'plugin:commission',
         'commission_reminder_before',
