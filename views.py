@@ -670,9 +670,7 @@ def manager(request):
 @has_journal
 @editor_user_required
 def commission_reminders(request):
-    commissioned_articles = models.CommissionedArticle.objects.all().exclude(
-        author_decision_editor_check=True,
-    )
+    commissioned_articles = models.CommissionedArticle.objects.all()
     reminder_before_days = request.journal.get_setting(
         'plugin:commission',
         'commission_reminder_before',
