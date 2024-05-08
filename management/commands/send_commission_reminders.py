@@ -131,7 +131,7 @@ def send_before_messages(request, ca, journal, before_or_after):
         html,
     )
     if before_or_after == 'before':
-        ca.reminder_before_sent = timezone.now()
+        pass#ca.reminder_before_sent = timezone.now()
     elif before_or_after == 'after':
         ca.reminder_after_sent = timezone.now()
     elif before_or_after == 's_after':

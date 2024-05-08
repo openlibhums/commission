@@ -39,4 +39,7 @@ urlpatterns = [
     url(r'^(?P<commissioned_article_id>\d+)/author/decision/$',
         views.commissioned_author_decision,
         name='commissioned_author_decision'),
+    url(r'^reminders/$',
+        views.commission_reminders,
+        name='commission_reminders'),
 ]

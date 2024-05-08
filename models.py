@@ -112,9 +112,6 @@ class CommissionedArticle(models.Model):
         ).processed_value
 
         dt = self.deadline - timedelta(days=reminder_before_days)
-
-        if dt < timezone.now().date():
-            return 'This date has now passed.'
         return dt
 
     def reminder_after_date(self):
@@ -125,8 +122,6 @@ class CommissionedArticle(models.Model):
         ).processed_value
 
         dt = self.deadline + timedelta(days=reminder_after_days)
-        if dt < timezone.now().date():
-            return 'This date has now passed.'
         return dt
 
     def submission_reminder_before_date(self):
@@ -136,10 +131,7 @@ class CommissionedArticle(models.Model):
             self.article.journal,
         ).processed_value
 
-        dt = self.deadline - timedelta(days=reminder_before_days)
-
-        if dt < timezone.now().date():
-            return 'This date has now passed.'
+        dt = self.submission_deadline - timedelta(days=reminder_before_days)
         return dt
 
     def submission_reminder_after_date(self):
@@ -149,9 +141,7 @@ class CommissionedArticle(models.Model):
             self.article.journal,
         ).processed_value
 
-        dt = self.deadline + timedelta(days=reminder_after_days)
-        if dt < timezone.now().date():
-            return 'This date has now passed.'
+        dt = self.submission_deadline + timedelta(days=reminder_after_days)
         return dt
 
     def check_expiry(self):

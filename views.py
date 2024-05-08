@@ -665,3 +665,41 @@ def manager(request):
         template,
         context,
     )
+
+
+@has_journal
+@editor_user_required
+def commission_reminders(request):
+    commissioned_articles = models.CommissionedArticle.objects.all().exclude(
+        author_decision_editor_check=True,
+    )
+    reminder_before_days = request.journal.get_setting(
+        'plugin:commission',
+        'commission_reminder_before',
+    )
+    reminder_after_days = request.journal.get_setting(
+        'plugin:commission',
+        'commission_reminder_after',
+    )
+    submission_before_days = request.journal.get_setting(
+        'plugin:commission',
+        'submission_reminder_before',
+    )
+    submission_after_days = request.journal.get_setting(
+        'plugin:commission',
+        'submission_reminder_after',
+    )
+
+    context = {
+        'commissioned_articles': commissioned_articles,
+        'reminder_before_days': reminder_before_days,
+        'reminder_after_days': reminder_after_days,
+        'submission_before_days': submission_before_days,
+        'submission_after_days': submission_after_days,
+    }
+    template = 'commission/commission_reminders.html'
+    return render(
+        request,
+        template,
+        context,
+    )
