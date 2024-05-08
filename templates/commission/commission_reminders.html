@@ -65,11 +65,11 @@
                         <td>{{ ca.article.id|default:'Not started'}}</td>
                         <td>{{ ca.article.title|default:'Not started' }}</td>
                         <td>{{ ca.deadline }}</td>
-                        <td>{{ ca.reminder_before_date }} {{ ca.reminder_before_sent|bool_fa }}</td>
-                        <td>{{ ca.reminder_after_date }} {{ ca.reminder_after_sent|bool_fa }}</td>
+                        <td>{{ ca.reminder_before_date }} {% if ca.reminder_before_sent %}({{ ca.reminder_before_sent|bool_fa }} {{ ca.reminder_before_sent }}){% endif %}</td>
+                        <td>{{ ca.reminder_after_date }} {% if ca.reminder_after_sent %}({{ ca.reminder_after_sent|bool_fa }} {{ ca.reminder_after_sent }}){% endif %}</td>
                         <td>{{ ca.submission_deadline }} </td>
-                        <td>{{ ca.submission_reminder_before_date }} {{ ca.submission_reminder_before_sent|bool_fa }}</td>
-                        <td>{{ ca.submission_reminder_after_date }} {{ ca.submission_reminder_after_sent|bool_fa }}</td>
+                        <td>{{ ca.submission_reminder_before_date }} {% if ca.submission_reminder_before_sent %}({{ ca.submission_reminder_before_sent|bool_fa }} {{ ca.submission_reminder_before_sent }}){% endif %}</td>
+                        <td>{{ ca.submission_reminder_after_date }} {% if ca.submission_reminder_after_sent %}({{ ca.submission_reminder_after_sent|bool_fa }} {{ ca.submission_reminder_after_sent }}){% endif %}</td>
                         <td><a href="{% url 'commissioned_article_details' ca.id %}">Manage</a>
                         </td>
                     </tr>
