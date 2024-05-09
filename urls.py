@@ -42,4 +42,7 @@ urlpatterns = [
     url(r'^reminders/$',
         views.commission_reminders,
         name='commission_reminders'),
+    url(r'^(?P<commissioned_article_id>\d+)/reminders/preview/(?P<type_of_reminder>[\w-]+)/$',
+        views.commission_preview_reminder,
+        name='commission_preview_reminder'),
 ]

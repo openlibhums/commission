@@ -1,0 +1,25 @@
+{% extends "admin/core/base.html" %}
+{% load static roles bool_fa %}
+
+{% block title %}Commission Articles{% endblock %}
+{% block title-section %}Commission Articles{% endblock %}
+{% block title-sub %}Lists commissioned articles{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li><a href="{% url 'commission_index' %}">Commissioning Index</a></li>
+    <li><a href="{% url 'commission_reminders' %}">Commission Reminders</a></li>
+    <li>Preview Reminder</li>
+{% endblock %}
+
+{% block body %}
+    <div class="box">
+        <div class="title-area">
+            <h2>Previewing Reminder for {{ ca.article.title }}</h2>
+        </div>
+        <div class="content">
+            {{ email_html|safe }}
+        </div>
+    </div>
+
+{% endblock %}

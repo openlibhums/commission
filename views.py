@@ -1,10 +1,9 @@
-from uuid import uuid4
-
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import Http404
 
 from plugins.commission import (
     forms,
@@ -15,7 +14,7 @@ from plugins.commission import (
 from security.decorators import editor_user_required, any_editor_user_required
 from submission.forms import AuthorForm
 from submission import logic
-from utils import shared, notify_helpers, setting_handler
+from utils import shared, notify_helpers, setting_handler, render_template
 from security.decorators import has_journal
 from core import models as core_models, forms as core_forms
 
@@ -699,6 +698,69 @@ def commission_reminders(request):
         'submission_after_days': submission_after_days,
     }
     template = 'commission/commission_reminders.html'
+    return render(
+        request,
+        template,
+        context,
+    )
+
+
+@has_journal
+@editor_user_required
+def commission_preview_reminder(request, commissioned_article_id, type_of_reminder):
+    ca = get_object_or_404(
+        models.CommissionedArticle,
+        pk=commissioned_article_id,
+        journal=request.journal,
+    )
+    template_name = None
+    if type_of_reminder == 'before':
+        template_name = 'commission_reminder_before_email'
+    elif type_of_reminder == 'after':
+        template_name = 'commission_reminder_after_email'
+    elif type_of_reminder == 's_before':
+        template_name = 'commission_reminder_before_article_sub_email'
+    elif type_of_reminder == 's_after':
+        template_name = 'commission_reminder_after_article_sub_email'
+
+    if type_of_reminder in ['before', 'after']:
+        path = reverse(
+            'commissioned_author_decision',
+            kwargs={
+                'commissioned_article_id': ca.pk,
+            }
+        )
+    else:
+        path = reverse(
+            'submit_info',
+            kwargs={
+                'article_id': ca.article.pk,
+            }
+        )
+    url = request.journal.site_url(
+        path=path,
+    )
+    context = {
+        'commissioned_article': ca,
+        'url': url,
+        'journal': request.journal,
+    }
+    email_html = render_template.get_requestless_content(
+        context=context,
+        journal=request.journal,
+        template=template_name,
+        group_name='plugin:commission',
+    )
+
+    if not template_name:
+        raise Http404('No reminder type found for that string.')
+
+    context = {
+        'ca': ca,
+        'email_html': email_html,
+    }
+    template = 'commission/preview_reminder.html'
+
     return render(
         request,
         template,

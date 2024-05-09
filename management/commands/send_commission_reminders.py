@@ -104,12 +104,20 @@ def send_before_messages(request, ca, journal, before_or_after):
     else:
         template_name = 'commission_reminder_after_article_sub_email'
 
-    path = reverse(
-        'commissioned_author_decision',
-        kwargs={
-            'commissioned_article_id': ca.pk,
-        }
-    )
+    if before_or_after in ['before', 'after']:
+        path = reverse(
+            'commissioned_author_decision',
+            kwargs={
+                'commissioned_article_id': ca.pk,
+            }
+        )
+    else:
+        path = reverse(
+            'submit_info',
+            kwargs={
+                'article_id': ca.article.pk,
+            }
+        )
     url = journal.site_url(
         path=path,
     )
@@ -124,14 +132,20 @@ def send_before_messages(request, ca, journal, before_or_after):
         template=template_name,
         group_name='plugin:commission',
     )
+    bcc = request.journal.get_setting(
+        'plugin:commission',
+        'commission_cc_address',
+    )
     notify_helpers.send_email_with_body_from_user(
         request,
         'Commissioned Article Reminder',
         ca.commissioned_author.email,
         html,
+        bcc=[bcc] if bcc else None,
     )
+
     if before_or_after == 'before':
-        pass#ca.reminder_before_sent = timezone.now()
+        ca.reminder_before_sent = timezone.now()
     elif before_or_after == 'after':
         ca.reminder_after_sent = timezone.now()
     elif before_or_after == 's_after':
