@@ -113,7 +113,7 @@ def send_before_messages(request, ca, journal, before_or_after):
         )
     else:
         path = reverse(
-            'submit_info',
+            'submit_start',
             kwargs={
                 'article_id': ca.article.pk,
             }
@@ -160,7 +160,7 @@ def send_before_messages(request, ca, journal, before_or_after):
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        journals = journal_models.Journal.objects.filter(code='olh')
+        journals = journal_models.Journal.objects.all()
 
         for journal in journals:
             print(f"Processing {journal.name}")
