@@ -113,7 +113,7 @@ def send_before_messages(request, ca, journal, before_or_after):
         )
     else:
         path = reverse(
-            'submit_start',
+            'submit_info',
             kwargs={
                 'article_id': ca.article.pk,
             }
