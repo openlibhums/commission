@@ -136,7 +136,7 @@ def commissioned_article(request, commissioned_article_id):
             existing_author_form = forms.ExistingAuthor(request.POST)
             if existing_author_form.is_valid():
                 author = existing_author_form.cleaned_data.get('author')
-                commissioned_article.article.authors.add(author)
+                author.snapshot_self(commissioned_article.article)
                 messages.add_message(
                     request,
                     messages.SUCCESS,
@@ -174,7 +174,7 @@ def commissioned_article(request, commissioned_article_id):
 
             author_exists = logic.check_author_exists(request.POST.get('email'))
             if author_exists:
-                commissioned_article.article.authors.add(author_exists)
+                author_exists.snapshot_self(commissioned_article.article)
                 messages.add_message(
                     request,
                     messages.SUCCESS,
@@ -190,7 +190,7 @@ def commissioned_article(request, commissioned_article_id):
                         role_slug='author',
                         journal=request.journal,
                     )
-                    commissioned_article.article.authors.add(new_author)
+                    new_author.snapshot_self(commissioned_article.article)
                     messages.add_message(
                         request,
                         messages.SUCCESS,
