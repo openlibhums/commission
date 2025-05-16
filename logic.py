@@ -1,6 +1,7 @@
 from utils import setting_handler, render_template
 from core import models
 from plugins.commission import models as commission_models
+from submission import models as submission_models
 
 from django.contrib import messages
 from django.shortcuts import reverse
@@ -8,8 +9,11 @@ from django.shortcuts import reverse
 
 def remove_author_from_article(request, article, author_id):
     try:
-        author = models.Account.objects.get(pk=author_id)
-    except models.Account.DoesNotExist:
+        frozen_author = submission_models.FrozenAuthor.objects.get(
+            article=article,
+            pk=author_id,
+        )
+    except (models.Account.DoesNotExist, submission_models.FrozenAuthor.DoesNotExist):
         messages.add_message(
             request,
             messages.WARNING,
@@ -17,19 +21,12 @@ def remove_author_from_article(request, article, author_id):
         )
         return
 
-    if author not in article.authors.all():
-        messages.add_message(
-            request,
-            messages.WARNING,
-            'This author is not in the list of authors for this article.'
-        )
-    else:
-        article.authors.remove(author)
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            'Author removed from article.'
-        )
+    frozen_author.delete()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        'Author removed from article.'
+    )
 
 
 def render_commission_email(request, commissioned_article):
