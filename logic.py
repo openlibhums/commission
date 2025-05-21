@@ -1,5 +1,4 @@
 from utils import setting_handler, render_template
-from core import models
 from plugins.commission import models as commission_models
 from submission import models as submission_models
 
@@ -13,7 +12,7 @@ def remove_author_from_article(request, article, author_id):
             article=article,
             pk=author_id,
         )
-    except (models.Account.DoesNotExist, submission_models.FrozenAuthor.DoesNotExist):
+    except submission_models.FrozenAuthor.DoesNotExist:
         messages.add_message(
             request,
             messages.WARNING,
