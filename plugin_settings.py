@@ -4,11 +4,11 @@ from utils.install import update_settings
 PLUGIN_NAME = 'Commission Articles'
 DESCRIPTION = 'Allows editors to commission articles.'
 AUTHOR = 'Open Library of Humanities'
-VERSION = '0.1'
+VERSION = '0.1.1'
 SHORT_NAME = 'commission'
 DISPLAY_NAME = 'Commission'
 MANAGER_URL = 'commission_index'
-JANEWAY_VERSION = "1.5.0"
+JANEWAY_VERSION = "1.7.0"
 IS_WORKFLOW_PLUGIN = False
 
 

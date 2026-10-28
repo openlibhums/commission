@@ -1,11 +1,29 @@
 import importlib
+from unittest import skipUnless
 
 from django.conf import settings
 from django.test import TestCase, override_settings
 from django.urls import clear_url_caches, reverse
+from packaging import version
 
+from janeway import __version__ as janeway_version
 from plugins.commission import forms, models, plugin_settings
+from submission import models as submission_models
 from utils.testing import helpers
+
+# Core only calls the submission_form_init hook from Janeway 1.9.
+HAS_SUBMISSION_FORM_INIT_HOOK = (
+    version.parse(janeway_version.base_version) >= version.parse('1.9')
+)
+
+
+def create_licence(journal, name, short_name):
+    return submission_models.Licence.objects.create(
+        journal=journal,
+        name=name,
+        short_name=short_name,
+        url='https://example.com',
+    )
 
 
 def reload_urlconf():
@@ -114,6 +132,10 @@ class CommissionSectionTests(TestCase):
             self.author,
         )
 
+    @skipUnless(
+        HAS_SUBMISSION_FORM_INIT_HOOK,
+        'Section locking needs the Janeway 1.9 submission_form_init hook',
+    )
     def test_commissioned_author_section_is_locked(self):
         article = helpers.create_article(
             self.journal,
@@ -127,7 +149,7 @@ class CommissionSectionTests(TestCase):
             commissioned_author=self.author,
             journal=self.journal,
         )
-        licence = helpers.create_licence(
+        licence = create_licence(
             self.journal,
             name='Creative Commons 4',
             short_name='CC4',
@@ -164,7 +186,7 @@ class CommissionSectionTests(TestCase):
             title='An Unsolicited Review',
             owner=self.author,
         )
-        licence = helpers.create_licence(
+        licence = create_licence(
             self.journal,
             name='Creative Commons 4',
             short_name='CC4',
